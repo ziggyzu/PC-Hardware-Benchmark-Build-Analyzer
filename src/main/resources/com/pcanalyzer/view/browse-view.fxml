@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.pcanalyzer.ui.BrowseController"
+      spacing="14.0" style="-fx-background-color: #0f172a;">
+    <padding>
+        <Insets top="16.0" right="20.0" bottom="16.0" left="20.0"/>
+    </padding>
+
+    <!-- Filter & Action Bar -->
+    <HBox alignment="CENTER_LEFT" spacing="12.0">
+        <Label text="Filter Category:" style="-fx-font-weight: bold; -fx-text-fill: #cbd5e1;"/>
+        <ComboBox fx:id="typeFilterComboBox" prefWidth="180.0" promptText="All Categories"/>
+
+        <Label text="Search:" style="-fx-font-weight: bold; -fx-text-fill: #cbd5e1;"/>
+        <TextField fx:id="searchTextField" promptText="Search by brand or name..." prefWidth="260.0" HBox.hgrow="ALWAYS"/>
+
+        <Button text="Reset Filters" onAction="#handleResetFilters" styleClass="btn-secondary"/>
+        <Button text="+ Add Component" onAction="#handleAddComponent" styleClass="btn-primary"/>
+        <Button text="⟳ Refresh" onAction="#handleRefresh" styleClass="btn-secondary"/>
+    </HBox>
+
+    <!-- Component TableView -->
+    <TableView fx:id="componentTableView" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="idColumn" text="ID" prefWidth="55.0"/>
+            <TableColumn fx:id="typeColumn" text="Type" prefWidth="120.0"/>
+            <TableColumn fx:id="brandColumn" text="Brand" prefWidth="110.0"/>
+            <TableColumn fx:id="nameColumn" text="Name" prefWidth="230.0"/>
+            <TableColumn fx:id="priceColumn" text="Price (USD)" prefWidth="100.0"/>
+            <TableColumn fx:id="tdpColumn" text="TDP (W)" prefWidth="85.0"/>
+            <TableColumn fx:id="specsColumn" text="Specifications" prefWidth="420.0"/>
+        </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+        </columnResizePolicy>
+    </TableView>
+
+    <!-- Bottom Actions -->
+    <HBox alignment="CENTER_LEFT" spacing="14.0">
+        <Button fx:id="addToBuildButton" text="✔ Add Selected to Build" onAction="#handleAddToBuild" styleClass="btn-success"/>
+        <Button fx:id="deleteButton" text="🗑 Delete Selected" onAction="#handleDeleteComponent" styleClass="btn-danger"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label fx:id="tableSummaryLabel" text="Showing 0 components" style="-fx-text-fill: #94a3b8;"/>
+    </HBox>
+
+</VBox>
