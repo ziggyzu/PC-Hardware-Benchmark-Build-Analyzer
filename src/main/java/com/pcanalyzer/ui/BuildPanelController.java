@@ -64,9 +64,9 @@ public class BuildPanelController {
                 } else {
                     setText(String.format("[%s] %s: %s", issue.getSeverity().getLabel(), issue.getRuleName(), issue.getMessage()));
                     if (issue.getSeverity() == CompatibilityStatus.INCOMPATIBLE) {
-                        setStyle("-fx-text-fill: #fca5a5; -fx-font-weight: bold;");
+                        setStyle("-fx-text-fill: #b22222; -fx-font-weight: bold;");
                     } else {
-                        setStyle("-fx-text-fill: #fde047;");
+                        setStyle("-fx-text-fill: #8b8000;");
                     }
                 }
             }

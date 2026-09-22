@@ -17,7 +17,7 @@
                     <Label text="Real-time compatibility checking, benchmark comparisons, and pricing insights" styleClass="app-subtitle"/>
                 </VBox>
                 <HBox alignment="CENTER_RIGHT" spacing="12.0">
-                    <Label fx:id="connectionStatusLabel" text="● Database Connected" style="-fx-text-fill: #4ade80; -fx-font-weight: bold;"/>
+                    <Label fx:id="connectionStatusLabel" text="● Database Connected" style="-fx-text-fill: #006400; -fx-font-weight: bold;"/>
                 </HBox>
             </HBox>
         </VBox>
@@ -38,10 +38,10 @@
 
             <!-- Tab 3: Comparison View Placeholder -->
             <Tab text="Performance Comparisons">
-                <VBox alignment="CENTER" spacing="16.0" style="-fx-padding: 40px; -fx-background-color: #0f172a;">
-                    <Label text="Hardware Comparison &amp; Benchmark Charts" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #38bdf8;"/>
+                <VBox alignment="CENTER" spacing="16.0" style="-fx-padding: 40px; -fx-background-color: #f0f0f0;">
+                    <Label text="Hardware Comparison &amp; Benchmark Charts" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2b579a;"/>
                     <Label text="Grouped bar charts for FPS by Resolution (1080p, 1440p, 4K) and Price-to-Performance ($/FPS, Points/$) will be integrated in Phase 5."
-                           style="-fx-font-size: 14px; -fx-text-fill: #94a3b8; -fx-text-alignment: center; -fx-max-width: 600px;" wrapText="true"/>
+                           style="-fx-font-size: 14px; -fx-text-fill: #333333; -fx-text-alignment: center; -fx-max-width: 600px;" wrapText="true"/>
                     <Button text="Switch to Hardware Catalog" onAction="#handleSwitchToCatalog" styleClass="btn-primary"/>
                 </VBox>
             </Tab>

@@ -7,17 +7,17 @@
 <VBox xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.pcanalyzer.ui.BrowseController"
-      spacing="14.0" style="-fx-background-color: #0f172a;">
+      spacing="14.0" style="-fx-background-color: #f0f0f0;">
     <padding>
         <Insets top="16.0" right="20.0" bottom="16.0" left="20.0"/>
     </padding>
 
     <!-- Filter & Action Bar -->
     <HBox alignment="CENTER_LEFT" spacing="12.0">
-        <Label text="Filter Category:" style="-fx-font-weight: bold; -fx-text-fill: #cbd5e1;"/>
+        <Label text="Filter Category:" style="-fx-font-weight: bold; -fx-text-fill: #333333;"/>
         <ComboBox fx:id="typeFilterComboBox" prefWidth="180.0" promptText="All Categories"/>
 
-        <Label text="Search:" style="-fx-font-weight: bold; -fx-text-fill: #cbd5e1;"/>
+        <Label text="Search:" style="-fx-font-weight: bold; -fx-text-fill: #333333;"/>
         <TextField fx:id="searchTextField" promptText="Search by brand or name..." prefWidth="260.0" HBox.hgrow="ALWAYS"/>
 
         <Button text="Reset Filters" onAction="#handleResetFilters" styleClass="btn-secondary"/>
@@ -46,7 +46,7 @@
         <Button fx:id="addToBuildButton" text="✔ Add Selected to Build" onAction="#handleAddToBuild" styleClass="btn-success"/>
         <Button fx:id="deleteButton" text="🗑 Delete Selected" onAction="#handleDeleteComponent" styleClass="btn-danger"/>
         <Region HBox.hgrow="ALWAYS"/>
-        <Label fx:id="tableSummaryLabel" text="Showing 0 components" style="-fx-text-fill: #94a3b8;"/>
+        <Label fx:id="tableSummaryLabel" text="Showing 0 components" style="-fx-text-fill: #333333;"/>
     </HBox>
 
 </VBox>

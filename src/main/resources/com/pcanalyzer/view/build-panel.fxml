@@ -7,81 +7,81 @@
 <ScrollPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.pcanalyzer.ui.BuildPanelController"
-            fitToWidth="true" style="-fx-background-color: #0f172a;">
+            fitToWidth="true" style="-fx-background-color: #f0f0f0;">
 
-    <HBox spacing="20.0" style="-fx-background-color: #0f172a;">
+    <HBox spacing="20.0" style="-fx-background-color: #f0f0f0;">
         <padding>
             <Insets top="20.0" right="20.0" bottom="20.0" left="20.0"/>
         </padding>
 
         <!-- Left Column: Component Slots -->
         <VBox spacing="14.0" HBox.hgrow="ALWAYS" prefWidth="640.0">
-            <Label text="Installed Build Components" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #38bdf8;"/>
+            <Label text="Installed Build Components" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2b579a;"/>
 
             <!-- CPU Slot -->
             <VBox styleClass="card" spacing="6.0">
-                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="card-header">
                     <Label text="Processor (CPU)" styleClass="card-title"/>
                     <Region HBox.hgrow="ALWAYS"/>
-                    <Label fx:id="cpuPriceLabel" text="\$0.00" style="-fx-font-weight: bold; -fx-text-fill: #38bdf8;"/>
+                    <Label fx:id="cpuPriceLabel" text="\$0.00" style="-fx-font-weight: bold; -fx-text-fill: #2b579a;"/>
                     <Button text="Remove" onAction="#handleRemoveCpu" styleClass="btn-secondary" style="-fx-font-size: 11px; -fx-padding: 4px 10px;"/>
                 </HBox>
-                <Label fx:id="cpuNameLabel" text="No CPU selected" style="-fx-font-size: 14px; -fx-text-fill: #f8fafc;"/>
-                <Label fx:id="cpuSpecsLabel" text="Select a CPU from the Hardware Catalog" style="-fx-text-fill: #94a3b8;"/>
+                <Label fx:id="cpuNameLabel" text="No CPU selected" style="-fx-font-size: 14px; -fx-text-fill: #000000;"/>
+                <Label fx:id="cpuSpecsLabel" text="Select a CPU from the Hardware Catalog" style="-fx-text-fill: #333333;"/>
             </VBox>
 
             <!-- Motherboard Slot -->
             <VBox styleClass="card" spacing="6.0">
-                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="card-header">
                     <Label text="Motherboard" styleClass="card-title"/>
                     <Region HBox.hgrow="ALWAYS"/>
-                    <Label fx:id="moboPriceLabel" text="\$0.00" style="-fx-font-weight: bold; -fx-text-fill: #38bdf8;"/>
+                    <Label fx:id="moboPriceLabel" text="\$0.00" style="-fx-font-weight: bold; -fx-text-fill: #2b579a;"/>
                     <Button text="Remove" onAction="#handleRemoveMotherboard" styleClass="btn-secondary" style="-fx-font-size: 11px; -fx-padding: 4px 10px;"/>
                 </HBox>
-                <Label fx:id="moboNameLabel" text="No Motherboard selected" style="-fx-font-size: 14px; -fx-text-fill: #f8fafc;"/>
-                <Label fx:id="moboSpecsLabel" text="Select a Motherboard from the Hardware Catalog" style="-fx-text-fill: #94a3b8;"/>
+                <Label fx:id="moboNameLabel" text="No Motherboard selected" style="-fx-font-size: 14px; -fx-text-fill: #000000;"/>
+                <Label fx:id="moboSpecsLabel" text="Select a Motherboard from the Hardware Catalog" style="-fx-text-fill: #333333;"/>
             </VBox>
 
             <!-- RAM Slot -->
             <VBox styleClass="card" spacing="6.0">
-                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="card-header">
                     <Label text="Memory (RAM)" styleClass="card-title"/>
                     <Region HBox.hgrow="ALWAYS"/>
-                    <Label fx:id="ramPriceLabel" text="\$0.00" style="-fx-font-weight: bold; -fx-text-fill: #38bdf8;"/>
+                    <Label fx:id="ramPriceLabel" text="\$0.00" style="-fx-font-weight: bold; -fx-text-fill: #2b579a;"/>
                     <Button text="Remove" onAction="#handleRemoveRam" styleClass="btn-secondary" style="-fx-font-size: 11px; -fx-padding: 4px 10px;"/>
                 </HBox>
-                <Label fx:id="ramNameLabel" text="No RAM selected" style="-fx-font-size: 14px; -fx-text-fill: #f8fafc;"/>
-                <Label fx:id="ramSpecsLabel" text="Select RAM from the Hardware Catalog" style="-fx-text-fill: #94a3b8;"/>
+                <Label fx:id="ramNameLabel" text="No RAM selected" style="-fx-font-size: 14px; -fx-text-fill: #000000;"/>
+                <Label fx:id="ramSpecsLabel" text="Select RAM from the Hardware Catalog" style="-fx-text-fill: #333333;"/>
             </VBox>
 
             <!-- GPU Slot -->
             <VBox styleClass="card" spacing="6.0">
-                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="card-header">
                     <Label text="Graphics Card (GPU)" styleClass="card-title"/>
                     <Region HBox.hgrow="ALWAYS"/>
-                    <Label fx:id="gpuPriceLabel" text="\$0.00" style="-fx-font-weight: bold; -fx-text-fill: #38bdf8;"/>
+                    <Label fx:id="gpuPriceLabel" text="\$0.00" style="-fx-font-weight: bold; -fx-text-fill: #2b579a;"/>
                     <Button text="Remove" onAction="#handleRemoveGpu" styleClass="btn-secondary" style="-fx-font-size: 11px; -fx-padding: 4px 10px;"/>
                 </HBox>
-                <Label fx:id="gpuNameLabel" text="No GPU selected" style="-fx-font-size: 14px; -fx-text-fill: #f8fafc;"/>
-                <Label fx:id="gpuSpecsLabel" text="Select a GPU from the Hardware Catalog" style="-fx-text-fill: #94a3b8;"/>
+                <Label fx:id="gpuNameLabel" text="No GPU selected" style="-fx-font-size: 14px; -fx-text-fill: #000000;"/>
+                <Label fx:id="gpuSpecsLabel" text="Select a GPU from the Hardware Catalog" style="-fx-text-fill: #333333;"/>
             </VBox>
 
             <!-- PSU Slot -->
             <VBox styleClass="card" spacing="6.0">
-                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="card-header">
                     <Label text="Power Supply (PSU)" styleClass="card-title"/>
                     <Region HBox.hgrow="ALWAYS"/>
-                    <Label fx:id="psuPriceLabel" text="\$0.00" style="-fx-font-weight: bold; -fx-text-fill: #38bdf8;"/>
+                    <Label fx:id="psuPriceLabel" text="\$0.00" style="-fx-font-weight: bold; -fx-text-fill: #2b579a;"/>
                     <Button text="Remove" onAction="#handleRemovePsu" styleClass="btn-secondary" style="-fx-font-size: 11px; -fx-padding: 4px 10px;"/>
                 </HBox>
-                <Label fx:id="psuNameLabel" text="No PSU selected" style="-fx-font-size: 14px; -fx-text-fill: #f8fafc;"/>
-                <Label fx:id="psuSpecsLabel" text="Select a PSU from the Hardware Catalog" style="-fx-text-fill: #94a3b8;"/>
+                <Label fx:id="psuNameLabel" text="No PSU selected" style="-fx-font-size: 14px; -fx-text-fill: #000000;"/>
+                <Label fx:id="psuSpecsLabel" text="Select a PSU from the Hardware Catalog" style="-fx-text-fill: #333333;"/>
             </VBox>
         </VBox>
 
         <!-- Right Column: Summary & Compatibility Diagnostics -->
         <VBox spacing="16.0" prefWidth="440.0">
-            <Label text="Build Analysis &amp; Summary" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #38bdf8;"/>
+            <Label text="Build Analysis &amp; Summary" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2b579a;"/>
 
             <!-- Financial & Power Stats Card -->
             <VBox styleClass="card" spacing="14.0">
@@ -95,29 +95,29 @@
                 <GridPane hgap="16.0" vgap="10.0">
                     <VBox GridPane.columnIndex="0" GridPane.rowIndex="0">
                         <Label text="RAW TDP" styleClass="stat-label"/>
-                        <Label fx:id="totalTdpLabel" text="0 W" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #f8fafc;"/>
+                        <Label fx:id="totalTdpLabel" text="0 W" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #000000;"/>
                     </VBox>
                     <VBox GridPane.columnIndex="1" GridPane.rowIndex="0">
                         <Label text="ESTIMATED PEAK" styleClass="stat-label"/>
-                        <Label fx:id="estimatedPeakLabel" text="70 W" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #f8fafc;"/>
+                        <Label fx:id="estimatedPeakLabel" text="70 W" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #000000;"/>
                     </VBox>
                     <VBox GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.columnSpan="2">
                         <Label text="RECOMMENDED MINIMUM PSU" styleClass="stat-label"/>
-                        <Label fx:id="recommendedPsuLabel" text="84 W (+20% Headroom)" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #38bdf8;"/>
+                        <Label fx:id="recommendedPsuLabel" text="84 W (+20% Headroom)" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2b579a;"/>
                     </VBox>
                 </GridPane>
             </VBox>
 
             <!-- Compatibility Status Card -->
             <VBox styleClass="card" spacing="10.0" VBox.vgrow="ALWAYS">
-                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="card-header">
                     <Label text="COMPATIBILITY STATUS" styleClass="stat-label"/>
                     <Region HBox.hgrow="ALWAYS"/>
                     <Label fx:id="compatibilityBadge" text="Compatible" styleClass="badge, badge-compatible"/>
                 </HBox>
 
-                <Label text="Diagnostic Checks:" style="-fx-font-weight: bold; -fx-text-fill: #cbd5e1;"/>
-                <ListView fx:id="diagnosticListView" prefHeight="180.0" style="-fx-background-color: #0f172a; -fx-border-color: #334155; -fx-border-radius: 6px;"/>
+                <Label text="Diagnostic Checks:" style="-fx-font-weight: bold; -fx-text-fill: #333333;"/>
+                <ListView fx:id="diagnosticListView" prefHeight="180.0" style="-fx-background-color: #f0f0f0; -fx-border-color: #a0a0a0; -fx-border-radius: 6px;"/>
             </VBox>
 
             <!-- Action Buttons -->
