@@ -27,6 +27,7 @@ public class MainController {
     // Injected nested controllers matching fx:id + "Controller"
     @FXML private BrowseController browseViewController;
     @FXML private BuildPanelController buildPanelViewController;
+    @FXML private ComparisonController comparisonViewController;
 
     private DatabaseManager dbManager;
     private ComponentDao componentDao;
@@ -52,6 +53,11 @@ public class MainController {
 
             // Wire status messaging
             browseViewController.setOnStatusMessageCallback(this::setStatusMessage);
+        }
+
+        // Wire dependencies to Comparison tab controller
+        if (comparisonViewController != null) {
+            comparisonViewController.setComponentDao(componentDao);
         }
 
         updateComponentCount();

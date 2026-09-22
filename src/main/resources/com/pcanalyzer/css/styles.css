@@ -343,3 +343,144 @@
 .check-box:selected > .box > .mark {
     -fx-background-color: #000000;
 }
+
+/* ========================================================= */
+/* Chart Styles (Phase 5 — Performance Comparisons)          */
+/* ========================================================= */
+
+/* Chart background and plot area */
+.chart {
+    -fx-background-color: transparent;
+    -fx-padding: 4px;
+}
+
+.chart-plot-background {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #a0a0a0;
+    -fx-border-width: 1px;
+}
+
+.chart-content {
+    -fx-padding: 6px;
+}
+
+/* Grid lines */
+.chart-horizontal-grid-lines {
+    -fx-stroke: #d0d0d0;
+    -fx-stroke-dash-array: 4 4;
+}
+
+.chart-vertical-grid-lines {
+    -fx-stroke: #e0e0e0;
+    -fx-stroke-dash-array: 4 4;
+}
+
+.chart-horizontal-zero-line,
+.chart-vertical-zero-line {
+    -fx-stroke: #888888;
+}
+
+/* Alternative grid lines (solid for classic feel) */
+.chart-alternative-row-fill {
+    -fx-fill: #f8f8f8;
+    -fx-stroke: transparent;
+}
+
+.chart-alternative-column-fill {
+    -fx-fill: transparent;
+}
+
+/* Axis styling */
+.axis {
+    -fx-font-size: 11px;
+    -fx-tick-label-fill: #333333;
+}
+
+.axis-label {
+    -fx-text-fill: #333333;
+    -fx-font-weight: bold;
+    -fx-font-size: 11px;
+}
+
+.axis-tick-mark,
+.axis-minor-tick-mark {
+    -fx-stroke: #888888;
+}
+
+/* Rotate x-axis labels for readability */
+.chart .axis:bottom .axis-tick-mark {
+    -fx-stroke: #888888;
+}
+
+/* Bar chart series colors — classic solid corporate palette */
+/* Series 0: 1080p / primary — steel blue */
+.default-color0.chart-bar {
+    -fx-bar-fill: #2b579a;
+}
+
+/* Series 1: 1440p — teal */
+.default-color1.chart-bar {
+    -fx-bar-fill: #2e8b57;
+}
+
+/* Series 2: 4K — dark goldenrod */
+.default-color2.chart-bar {
+    -fx-bar-fill: #b8860b;
+}
+
+/* Series 3-7 fallback colors */
+.default-color3.chart-bar {
+    -fx-bar-fill: #8b0000;
+}
+.default-color4.chart-bar {
+    -fx-bar-fill: #4b0082;
+}
+.default-color5.chart-bar {
+    -fx-bar-fill: #006400;
+}
+.default-color6.chart-bar {
+    -fx-bar-fill: #8b4513;
+}
+.default-color7.chart-bar {
+    -fx-bar-fill: #483d8b;
+}
+
+/* Legend styling */
+.chart-legend {
+    -fx-background-color: #f0f0f0;
+    -fx-border-color: #a0a0a0;
+    -fx-border-width: 1px;
+    -fx-padding: 4px 8px;
+}
+
+.chart-legend-item {
+    -fx-font-size: 11px;
+    -fx-text-fill: #000000;
+}
+
+/* Legend symbols — square, matching bar colors */
+.default-color0.chart-legend-item-symbol {
+    -fx-background-color: #2b579a;
+    -fx-background-radius: 0;
+}
+.default-color1.chart-legend-item-symbol {
+    -fx-background-color: #2e8b57;
+    -fx-background-radius: 0;
+}
+.default-color2.chart-legend-item-symbol {
+    -fx-background-color: #b8860b;
+    -fx-background-radius: 0;
+}
+.default-color3.chart-legend-item-symbol {
+    -fx-background-color: #8b0000;
+    -fx-background-radius: 0;
+}
+
+/* Head-to-Head Comparison Grid */
+.comparison-winner {
+    -fx-background-color: #d4edda;
+}
+
+.comparison-loser {
+    -fx-background-color: #f8d7da;
+}

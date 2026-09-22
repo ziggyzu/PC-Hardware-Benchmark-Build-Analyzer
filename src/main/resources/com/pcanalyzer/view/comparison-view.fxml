@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.pcanalyzer.ui.ComparisonController"
+      spacing="10.0" style="-fx-background-color: #f0f0f0;">
+    <padding>
+        <Insets top="10.0" right="14.0" bottom="10.0" left="14.0"/>
+    </padding>
+
+    <!-- Toolbar -->
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <Label text="Category:" style="-fx-font-weight: bold;"/>
+        <ComboBox fx:id="categoryComboBox" prefWidth="200.0"/>
+        <Label text="Resolution (GPU):" style="-fx-font-weight: bold;" fx:id="resolutionLabel"/>
+        <ComboBox fx:id="resolutionComboBox" prefWidth="140.0"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="Refresh Charts" onAction="#handleRefresh" styleClass="btn-primary"/>
+    </HBox>
+
+    <!-- Top Chart: FPS / Benchmark Score Bar Chart -->
+    <VBox styleClass="card" VBox.vgrow="ALWAYS">
+        <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="card-header">
+            <Label fx:id="mainChartTitle" text="GPU Gaming FPS Comparison" styleClass="card-title"/>
+        </HBox>
+        <BarChart fx:id="mainBarChart" legendVisible="true" animated="false"
+                  VBox.vgrow="ALWAYS" style="-fx-padding: 6px;">
+            <xAxis>
+                <CategoryAxis fx:id="mainXAxis" label="Component"/>
+            </xAxis>
+            <yAxis>
+                <NumberAxis fx:id="mainYAxis" label="FPS" autoRanging="true"/>
+            </yAxis>
+        </BarChart>
+    </VBox>
+
+    <!-- Bottom Row: Price-to-Performance + Head-to-Head -->
+    <HBox spacing="10.0" VBox.vgrow="ALWAYS">
+
+        <!-- Bottom-Left: Price-to-Performance Chart -->
+        <VBox styleClass="card" HBox.hgrow="ALWAYS">
+            <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="card-header">
+                <Label fx:id="valueChartTitle" text="Price-to-Performance ($/FPS)" styleClass="card-title"/>
+            </HBox>
+            <BarChart fx:id="valueBarChart" legendVisible="false" animated="false"
+                      VBox.vgrow="ALWAYS" style="-fx-padding: 6px;">
+                <xAxis>
+                    <CategoryAxis fx:id="valueXAxis" label="Component"/>
+                </xAxis>
+                <yAxis>
+                    <NumberAxis fx:id="valueYAxis" label="USD/FPS" autoRanging="true"/>
+                </yAxis>
+            </BarChart>
+        </VBox>
+
+        <!-- Bottom-Right: Head-to-Head Comparison -->
+        <VBox styleClass="card" prefWidth="420.0" minWidth="380.0">
+            <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="card-header">
+                <Label text="Head-to-Head Comparison" styleClass="card-title"/>
+            </HBox>
+            <VBox spacing="8.0" style="-fx-padding: 10px;">
+                <HBox spacing="8.0">
+                    <VBox spacing="2.0" HBox.hgrow="ALWAYS">
+                        <Label text="Component A:" style="-fx-font-weight: bold;"/>
+                        <ComboBox fx:id="compareComboA" maxWidth="Infinity"/>
+                    </VBox>
+                    <VBox spacing="2.0" HBox.hgrow="ALWAYS">
+                        <Label text="Component B:" style="-fx-font-weight: bold;"/>
+                        <ComboBox fx:id="compareComboB" maxWidth="Infinity"/>
+                    </VBox>
+                </HBox>
+                <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"
+                            style="-fx-background-color: transparent; -fx-border-color: #a0a0a0;">
+                    <GridPane fx:id="comparisonGrid" hgap="6.0" vgap="2.0"
+                              style="-fx-padding: 6px;"/>
+                </ScrollPane>
+            </VBox>
+        </VBox>
+    </HBox>
+</VBox>
