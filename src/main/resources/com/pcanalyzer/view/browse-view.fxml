@@ -4,49 +4,154 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox xmlns="http://javafx.com/javafx/21"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.pcanalyzer.ui.BrowseController"
-      spacing="14.0" style="-fx-background-color: #f0f0f0;">
-    <padding>
-        <Insets top="16.0" right="20.0" bottom="16.0" left="20.0"/>
-    </padding>
+<SplitPane xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:id="browseSplitPane"
+           fx:controller="com.pcanalyzer.ui.BrowseController"
+           dividerPositions="0.72">
 
-    <!-- Filter & Action Bar -->
-    <HBox alignment="CENTER_LEFT" spacing="12.0">
-        <Label text="Filter Category:" style="-fx-font-weight: bold; -fx-text-fill: #333333;"/>
-        <ComboBox fx:id="typeFilterComboBox" prefWidth="180.0" promptText="All Categories"/>
+    <!-- Left Main Area: Catalog Table and Search Filters -->
+    <VBox spacing="10.0">
+        <padding>
+            <Insets top="12.0" right="14.0" bottom="12.0" left="14.0"/>
+        </padding>
 
-        <Label text="Search:" style="-fx-font-weight: bold; -fx-text-fill: #333333;"/>
-        <TextField fx:id="searchTextField" promptText="Search by brand or name..." prefWidth="260.0" HBox.hgrow="ALWAYS"/>
+        <!-- Top Search and Actions Bar -->
+        <HBox alignment="CENTER_LEFT" spacing="10.0">
+            <Label text="Search:" style="-fx-font-weight: bold;"/>
+            <TextField fx:id="searchTextField" promptText="Search brand, name, or specs..." prefWidth="220.0" HBox.hgrow="ALWAYS">
+                <tooltip><Tooltip text="Filter catalog by brand, model, or specifications in real-time"/></tooltip>
+            </TextField>
 
-        <Button text="Reset Filters" onAction="#handleResetFilters" styleClass="btn-secondary"/>
-        <Button text="+ Add Component" onAction="#handleAddComponent" styleClass="btn-primary"/>
-        <Button text="⟳ Refresh" onAction="#handleRefresh" styleClass="btn-secondary"/>
-    </HBox>
+            <Label text="Category:" style="-fx-font-weight: bold;"/>
+            <ComboBox fx:id="typeFilterComboBox" prefWidth="150.0" promptText="All Categories"/>
 
-    <!-- Component TableView -->
-    <TableView fx:id="componentTableView" VBox.vgrow="ALWAYS">
-        <columns>
-            <TableColumn fx:id="idColumn" text="ID" prefWidth="55.0"/>
-            <TableColumn fx:id="typeColumn" text="Type" prefWidth="120.0"/>
-            <TableColumn fx:id="brandColumn" text="Brand" prefWidth="110.0"/>
-            <TableColumn fx:id="nameColumn" text="Name" prefWidth="230.0"/>
-            <TableColumn fx:id="priceColumn" text="Price (USD)" prefWidth="100.0"/>
-            <TableColumn fx:id="tdpColumn" text="TDP (W)" prefWidth="85.0"/>
-            <TableColumn fx:id="specsColumn" text="Specifications" prefWidth="420.0"/>
-        </columns>
-        <columnResizePolicy>
-            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
-        </columnResizePolicy>
-    </TableView>
+            <Button text="Reset" onAction="#handleResetFilters" styleClass="btn-secondary">
+                <tooltip><Tooltip text="Reset all search filters and sliders to default"/></tooltip>
+            </Button>
+            <Button text="+ Add Component" onAction="#handleAddComponent" styleClass="btn-primary">
+                <tooltip><Tooltip text="Add a new hardware component to the database"/></tooltip>
+            </Button>
+            <Button text="⟳ Refresh" onAction="#handleRefresh" styleClass="btn-secondary">
+                <tooltip><Tooltip text="Reload all components from the database"/></tooltip>
+            </Button>
+        </HBox>
 
-    <!-- Bottom Actions -->
-    <HBox alignment="CENTER_LEFT" spacing="14.0">
-        <Button fx:id="addToBuildButton" text="✔ Add Selected to Build" onAction="#handleAddToBuild" styleClass="btn-success"/>
-        <Button fx:id="deleteButton" text="🗑 Delete Selected" onAction="#handleDeleteComponent" styleClass="btn-danger"/>
-        <Region HBox.hgrow="ALWAYS"/>
-        <Label fx:id="tableSummaryLabel" text="Showing 0 components" style="-fx-text-fill: #333333;"/>
-    </HBox>
+        <!-- Advanced Filter Row with Slider, CheckBox, and FlowPane -->
+        <HBox alignment="CENTER_LEFT" spacing="16.0" style="-fx-background-color: #f8fafc; -fx-padding: 8px 12px; -fx-border-color: #e2e8f0; -fx-border-radius: 4px; -fx-background-radius: 4px;">
+            <!-- Max Price Slider with Live Bound Label -->
+            <HBox alignment="CENTER_LEFT" spacing="8.0">
+                <Label text="Max Price:" style="-fx-font-weight: bold;"/>
+                <Slider fx:id="priceSlider" min="20.0" max="1000.0" value="1000.0" prefWidth="180.0" showTickMarks="false"/>
+                <Label fx:id="priceSliderLabel" text="\$1000" style="-fx-font-weight: bold; -fx-text-fill: #2563eb; -fx-min-width: 50px;"/>
+            </HBox>
 
-</VBox>
+            <Separator orientation="VERTICAL"/>
+
+            <!-- CheckBox Filter -->
+            <CheckBox fx:id="lowTdpCheckBox" text="Low Power Only (&lt; 100W TDP)">
+                <tooltip><Tooltip text="Filter components consuming less than 100 Watts"/></tooltip>
+            </CheckBox>
+
+            <Separator orientation="VERTICAL"/>
+
+            <!-- FlowPane of Quick-Filter Category Tags -->
+            <FlowPane fx:id="quickFilterFlowPane" hgap="6.0" vgap="4.0" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+                <Label text="Quick Tags:" style="-fx-font-size: 11px; -fx-text-fill: #64748b; -fx-font-weight: bold;"/>
+                <Button text="All" onAction="#handleQuickFilterAll" style="-fx-font-size: 10px; -fx-padding: 2px 8px;"/>
+                <Button text="CPUs" onAction="#handleQuickFilterCpu" style="-fx-font-size: 10px; -fx-padding: 2px 8px;"/>
+                <Button text="GPUs" onAction="#handleQuickFilterGpu" style="-fx-font-size: 10px; -fx-padding: 2px 8px;"/>
+                <Button text="Motherboards" onAction="#handleQuickFilterMobo" style="-fx-font-size: 10px; -fx-padding: 2px 8px;"/>
+                <Button text="RAM" onAction="#handleQuickFilterRam" style="-fx-font-size: 10px; -fx-padding: 2px 8px;"/>
+                <Button text="PSUs" onAction="#handleQuickFilterPsu" style="-fx-font-size: 10px; -fx-padding: 2px 8px;"/>
+            </FlowPane>
+        </HBox>
+
+        <!-- Dynamically Responsive TableView (Columns bound proportionally via DoubleBinding) -->
+        <TableView fx:id="componentTableView" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="idColumn" text="ID"/>
+                <TableColumn fx:id="typeColumn" text="Type"/>
+                <TableColumn fx:id="brandColumn" text="Brand"/>
+                <TableColumn fx:id="nameColumn" text="Model Name"/>
+                <TableColumn fx:id="priceColumn" text="Price ($)"/>
+                <TableColumn fx:id="tdpColumn" text="TDP (W)"/>
+                <TableColumn fx:id="specsColumn" text="Specifications"/>
+            </columns>
+        </TableView>
+
+        <!-- Bottom Actions Bar -->
+        <HBox alignment="CENTER_LEFT" spacing="12.0">
+            <Button fx:id="addToBuildButton" text="✔ Add Selected to Build" onAction="#handleAddToBuild" styleClass="btn-success">
+                <tooltip><Tooltip text="Insert selected hardware item into the active PC build"/></tooltip>
+            </Button>
+            <Button fx:id="deleteButton" text="🗑 Delete Selected" onAction="#handleDeleteComponent" styleClass="btn-danger">
+                <tooltip><Tooltip text="Remove selected hardware item from the SQLite database"/></tooltip>
+            </Button>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="tableSummaryLabel" text="Showing 0 components" style="-fx-text-fill: #475569; -fx-font-weight: bold;"/>
+        </HBox>
+    </VBox>
+
+    <!-- Right Side Inspector: Component Detail Card using TitledPane, StackPane & GridPane -->
+    <VBox spacing="10.0" minWidth="260.0" prefWidth="300.0" maxWidth="400.0">
+        <padding>
+            <Insets top="12.0" right="14.0" bottom="12.0" left="6.0"/>
+        </padding>
+
+        <TitledPane text="Component Inspector" collapsible="false" maxHeight="Infinity" VBox.vgrow="ALWAYS">
+            <StackPane fx:id="inspectorStackPane">
+                <!-- Empty selection placeholder -->
+                <VBox fx:id="inspectorPlaceholder" alignment="CENTER" spacing="10.0" style="-fx-padding: 20px;">
+                    <Label text="No Component Selected" style="-fx-font-weight: bold; -fx-text-fill: #64748b;"/>
+                    <Label text="Select a component in the table to inspect detailed specifications and power draw metrics."
+                           textAlignment="CENTER" wrapText="true" style="-fx-text-fill: #94a3b8; -fx-font-size: 11px;"/>
+                </VBox>
+
+                <!-- Detailed Specs Card -->
+                <VBox fx:id="inspectorDetails" spacing="12.0" visible="false" style="-fx-padding: 10px;">
+                    <VBox spacing="2.0">
+                        <Label fx:id="detailTypeLabel" text="COMPONENT TYPE" styleClass="stat-label"/>
+                        <Label fx:id="detailNameLabel" text="Model Name" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" wrapText="true"/>
+                        <Label fx:id="detailBrandLabel" text="Manufacturer Brand" style="-fx-text-fill: #64748b;"/>
+                    </VBox>
+
+                    <Separator/>
+
+                    <!-- Specifications Breakdown Grid -->
+                    <GridPane hgap="8.0" vgap="6.0">
+                        <columnConstraints>
+                            <ColumnConstraints minWidth="80.0" prefWidth="90.0"/>
+                            <ColumnConstraints hgrow="ALWAYS"/>
+                        </columnConstraints>
+                        <Label text="Price:" GridPane.columnIndex="0" GridPane.rowIndex="0" style="-fx-font-weight: bold;"/>
+                        <Label fx:id="detailPriceLabel" text="\$0.00" GridPane.columnIndex="1" GridPane.rowIndex="0" style="-fx-text-fill: #2563eb; -fx-font-weight: bold;"/>
+
+                        <Label text="TDP Rating:" GridPane.columnIndex="0" GridPane.rowIndex="1" style="-fx-font-weight: bold;"/>
+                        <Label fx:id="detailTdpLabel" text="0 W" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                        <Label text="Specs:" GridPane.columnIndex="0" GridPane.rowIndex="2" style="-fx-font-weight: bold;"/>
+                        <Label fx:id="detailSpecsLabel" text="N/A" GridPane.columnIndex="1" GridPane.rowIndex="2" wrapText="true"/>
+                    </GridPane>
+
+                    <Separator/>
+
+                    <!-- Power Consumption Relative Meter (ProgressBar) -->
+                    <VBox spacing="4.0">
+                        <HBox alignment="CENTER_LEFT">
+                            <Label text="TDP Power Draw Ratio (vs 350W max):" style="-fx-font-size: 10px; -fx-text-fill: #64748b;"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="detailTdpPercentLabel" text="0%" style="-fx-font-size: 10px; -fx-font-weight: bold;"/>
+                        </HBox>
+                        <ProgressBar fx:id="tdpProgressBar" progress="0.0" maxWidth="Infinity"/>
+                    </VBox>
+
+                    <Region VBox.vgrow="ALWAYS"/>
+
+                    <!-- Contextual Quick Action Button -->
+                    <Button fx:id="inspectorAddToBuildBtn" text="Add This Item to Build" onAction="#handleAddToBuild" maxWidth="Infinity" styleClass="btn-primary"/>
+                </VBox>
+            </StackPane>
+        </TitledPane>
+    </VBox>
+</SplitPane>

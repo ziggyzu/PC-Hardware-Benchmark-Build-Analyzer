@@ -1,486 +1,117 @@
-/* Classic Windows 7 / 2010s-era Theme ("SynergyFlow" aesthetic) */
-
-.root {
-    -fx-font-family: "Tahoma", "Arial", sans-serif;
-    -fx-font-size: 12px;
-    -fx-background-color: #f0f0f0;
-    -fx-text-fill: #000000;
-}
-
-/* Header Bar */
-.header-bar {
-    -fx-background-color: #f0f0f0;
-    -fx-padding: 10px 16px;
-    -fx-border-color: #a0a0a0;
-    -fx-border-width: 0 0 1px 0;
-}
+/* PC Hardware Analyzer - Minimal Semantic CSS */
+/* Native JavaFX Modena theme handles default UI controls and fonts */
 
 .app-title {
     -fx-font-size: 18px;
     -fx-font-weight: bold;
-    -fx-text-fill: #2b579a;
+    -fx-text-fill: #1e3a8a;
 }
 
 .app-subtitle {
-    -fx-font-size: 11px;
-    -fx-text-fill: #333333;
+    -fx-font-size: 12px;
+    -fx-text-fill: #475569;
 }
 
-/* Tab Pane */
-.tab-pane {
-    -fx-background-color: #f0f0f0;
-}
-
-.tab-pane .tab-header-area {
-    -fx-background-color: #e0e0e0;
-    -fx-padding: 2px 8px 0 8px;
-    -fx-border-color: #a0a0a0;
-    -fx-border-width: 0 0 1px 0;
-}
-
-.tab-pane .tab-header-background {
-    -fx-background-color: transparent;
-}
-
-.tab {
-    -fx-background-color: #e8e8e8;
-    -fx-background-radius: 0;
-    -fx-padding: 4px 12px;
-    -fx-border-color: #a0a0a0;
-    -fx-border-width: 1px 1px 0 1px;
-}
-
-.tab:selected {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #2b579a #a0a0a0 transparent #a0a0a0;
-    -fx-border-width: 3px 1px 0 1px;
-}
-
-.tab .tab-label {
-    -fx-text-fill: #333333;
-    -fx-font-weight: normal;
-}
-
-.tab:selected .tab-label {
-    -fx-text-fill: #000000;
-    -fx-font-weight: bold;
-}
-
-/* Buttons */
-.button {
-    -fx-background-color: #e0e0e0;
-    -fx-text-fill: #000000;
-    -fx-font-weight: normal;
-    -fx-padding: 4px 12px;
-    -fx-background-radius: 0;
-    -fx-border-radius: 0;
-    -fx-border-color: #888888;
-    -fx-border-width: 1px;
-    -fx-cursor: hand;
-}
-
-.button:hover {
-    -fx-background-color: #d0d0d0;
-}
-
-.button:pressed {
-    -fx-background-color: #c0c0c0;
-}
-
+/* Button Semantic Accents */
 .btn-primary {
-    -fx-background-color: #2b579a;
+    -fx-background-color: #2563eb;
     -fx-text-fill: #ffffff;
-    -fx-border-color: #1a3665;
+    -fx-font-weight: bold;
 }
 
 .btn-primary:hover {
-    -fx-background-color: #3b67aa;
+    -fx-background-color: #1d4ed8;
 }
 
 .btn-success {
-    -fx-background-color: #228b22;
+    -fx-background-color: #16a34a;
     -fx-text-fill: #ffffff;
-    -fx-border-color: #006400;
+    -fx-font-weight: bold;
 }
 
 .btn-success:hover {
-    -fx-background-color: #2e992e;
+    -fx-background-color: #15803d;
 }
 
 .btn-danger {
-    -fx-background-color: #b22222;
+    -fx-background-color: #dc2626;
     -fx-text-fill: #ffffff;
-    -fx-border-color: #8b0000;
+    -fx-font-weight: bold;
 }
 
 .btn-danger:hover {
-    -fx-background-color: #cc3333;
+    -fx-background-color: #b91c1c;
 }
 
 .btn-secondary {
-    -fx-background-color: #e0e0e0;
-    -fx-text-fill: #000000;
+    -fx-background-color: #e2e8f0;
+    -fx-text-fill: #1e293b;
 }
 
-/* Form Controls */
-.text-field {
-    -fx-background-color: #ffffff;
-    -fx-text-fill: #000000;
-    -fx-prompt-text-fill: #888888;
-    -fx-border-color: #a0a0a0;
-    -fx-border-radius: 0;
-    -fx-background-radius: 0;
-    -fx-padding: 4px 6px;
+.btn-secondary:hover {
+    -fx-background-color: #cbd5e1;
 }
 
-.text-field:focused {
-    -fx-border-color: #2b579a;
-}
-
-.combo-box {
-    -fx-background-color: #e0e0e0;
-    -fx-border-color: #888888;
-    -fx-border-radius: 0;
-    -fx-background-radius: 0;
-    -fx-padding: 2px 4px;
-}
-
-.combo-box .list-cell {
-    -fx-text-fill: #000000;
-}
-
-.combo-box-popup .list-view {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #a0a0a0;
-}
-
-.combo-box-popup .list-cell:filled:hover {
-    -fx-background-color: #d8e6f3;
-}
-
-.combo-box-popup .list-cell:filled:selected {
-    -fx-background-color: #3399ff;
-    -fx-text-fill: #ffffff;
-}
-
-/* TableView */
-.table-view {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #a0a0a0;
-    -fx-border-radius: 0;
-    -fx-background-radius: 0;
-}
-
-.table-view .column-header-background {
-    -fx-background-color: #e0e0e0;
-    -fx-border-color: #a0a0a0;
-    -fx-border-width: 0 0 1px 0;
-}
-
-.table-view .column-header {
-    -fx-background-color: transparent;
-    -fx-padding: 4px 6px;
-    -fx-border-color: #a0a0a0;
-    -fx-border-width: 0 1px 0 0;
-}
-
-.table-view .column-header .label {
-    -fx-text-fill: #000000;
-    -fx-font-weight: normal;
-}
-
-.table-row-cell {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #e8e8e8;
-    -fx-border-width: 0 0 1px 0;
-}
-
-.table-row-cell:odd {
-    -fx-background-color: #f4f4f4;
-}
-
-.table-row-cell:hover {
-    -fx-background-color: #d8e6f3;
-}
-
-.table-row-cell:selected {
-    -fx-background-color: #3399ff;
-    -fx-text-fill: #ffffff;
-}
-
-.table-cell {
-    -fx-text-fill: #000000;
-    -fx-padding: 4px 6px;
-    -fx-border-color: transparent transparent transparent #e8e8e8;
-    -fx-border-width: 0 0 0 1px;
-}
-
-/* Cards & Panels (The Boxy Panels) */
+/* Panel and Card Containers */
 .card {
-    -fx-background-color: #e8e8e8;
-    -fx-border-color: #a0a0a0;
-    -fx-border-radius: 0;
-    -fx-background-radius: 0;
-    -fx-padding: 0 0 10px 0;
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
 }
 
 .card-header {
-    -fx-background-color: #2b579a;
-    -fx-padding: 6px 10px;
+    -fx-background-color: #f1f5f9;
+    -fx-padding: 8px 12px;
+    -fx-border-color: #cbd5e1;
+    -fx-border-width: 0 0 1px 0;
+    -fx-border-radius: 6px 6px 0 0;
+    -fx-background-radius: 6px 6px 0 0;
 }
 
 .card-title {
-    -fx-font-size: 12px;
+    -fx-font-size: 13px;
     -fx-font-weight: bold;
-    -fx-text-fill: #ffffff;
-}
-
-.card-header .label {
-    -fx-text-fill: #ffffff;
+    -fx-text-fill: #1e293b;
 }
 
 .stat-value {
-    -fx-font-size: 16px;
+    -fx-font-size: 20px;
     -fx-font-weight: bold;
-    -fx-text-fill: #000000;
+    -fx-text-fill: #0f172a;
 }
 
 .stat-label {
     -fx-font-size: 11px;
-    -fx-text-fill: #333333;
-    -fx-text-transform: uppercase;
+    -fx-text-fill: #64748b;
     -fx-font-weight: bold;
 }
 
-/* Fix padding inside card content area since card padding top is 0 */
-.card > Label {
-    -fx-padding: 0 10px;
-}
-.card > VBox {
-    -fx-padding: 10px;
-}
-.card > GridPane {
-    -fx-padding: 0 10px;
-}
-.card > ListView {
-    -fx-border-color: #a0a0a0;
-    -fx-border-radius: 0;
-}
-
-/* Compatibility Badges (Simple Solid Dots/Indicators) */
+/* Compatibility Status Badges */
 .badge {
-    -fx-padding: 2px 6px;
-    -fx-background-radius: 0;
+    -fx-padding: 3px 8px;
+    -fx-background-radius: 4px;
     -fx-font-size: 11px;
     -fx-font-weight: bold;
-    -fx-border-radius: 0;
-    -fx-border-width: 1px;
 }
 
 .badge-compatible {
-    -fx-background-color: #e0f8e0;
-    -fx-text-fill: #006400;
-    -fx-border-color: #006400;
+    -fx-background-color: #dcfce7;
+    -fx-text-fill: #15803d;
+    -fx-border-color: #86efac;
+    -fx-border-radius: 4px;
 }
 
 .badge-warning {
-    -fx-background-color: #fffacd;
-    -fx-text-fill: #8b8000;
-    -fx-border-color: #8b8000;
+    -fx-background-color: #fef9c3;
+    -fx-text-fill: #a16207;
+    -fx-border-color: #fde047;
+    -fx-border-radius: 4px;
 }
 
 .badge-incompatible {
-    -fx-background-color: #ffe4e1;
-    -fx-text-fill: #8b0000;
-    -fx-border-color: #8b0000;
-}
-
-/* Status Bar */
-.status-bar {
-    -fx-background-color: #e0e0e0;
-    -fx-padding: 4px 10px;
-    -fx-border-color: #a0a0a0;
-    -fx-border-width: 1px 0 0 0;
-}
-
-.status-text {
-    -fx-text-fill: #333333;
-    -fx-font-size: 11px;
-}
-
-/* Classic Scrollbars */
-.scroll-bar {
-    -fx-background-color: #f0f0f0;
-}
-.scroll-bar .thumb {
-    -fx-background-color: #c0c0c0;
-    -fx-background-radius: 0;
-    -fx-border-color: #f0f0f0;
-}
-.scroll-bar .thumb:hover {
-    -fx-background-color: #a0a0a0;
-}
-.scroll-bar .track {
-    -fx-background-color: #e0e0e0;
-    -fx-border-color: #d0d0d0;
-}
-.scroll-bar .increment-button, .scroll-bar .decrement-button {
-    -fx-background-color: #e0e0e0;
-    -fx-background-radius: 0;
-    -fx-border-color: #a0a0a0;
-}
-.scroll-bar .increment-button:hover, .scroll-bar .decrement-button:hover {
-    -fx-background-color: #c0c0c0;
-}
-
-/* Standard Checkboxes (to override modena rounding) */
-.check-box > .box {
-    -fx-background-radius: 0;
-    -fx-border-radius: 0;
-    -fx-background-color: #ffffff;
-    -fx-border-color: #a0a0a0;
-}
-.check-box:selected > .box > .mark {
-    -fx-background-color: #000000;
-}
-
-/* ========================================================= */
-/* Chart Styles (Phase 5 — Performance Comparisons)          */
-/* ========================================================= */
-
-/* Chart background and plot area */
-.chart {
-    -fx-background-color: transparent;
-    -fx-padding: 4px;
-}
-
-.chart-plot-background {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #a0a0a0;
-    -fx-border-width: 1px;
-}
-
-.chart-content {
-    -fx-padding: 6px;
-}
-
-/* Grid lines */
-.chart-horizontal-grid-lines {
-    -fx-stroke: #d0d0d0;
-    -fx-stroke-dash-array: 4 4;
-}
-
-.chart-vertical-grid-lines {
-    -fx-stroke: #e0e0e0;
-    -fx-stroke-dash-array: 4 4;
-}
-
-.chart-horizontal-zero-line,
-.chart-vertical-zero-line {
-    -fx-stroke: #888888;
-}
-
-/* Alternative grid lines (solid for classic feel) */
-.chart-alternative-row-fill {
-    -fx-fill: #f8f8f8;
-    -fx-stroke: transparent;
-}
-
-.chart-alternative-column-fill {
-    -fx-fill: transparent;
-}
-
-/* Axis styling */
-.axis {
-    -fx-font-size: 11px;
-    -fx-tick-label-fill: #333333;
-}
-
-.axis-label {
-    -fx-text-fill: #333333;
-    -fx-font-weight: bold;
-    -fx-font-size: 11px;
-}
-
-.axis-tick-mark,
-.axis-minor-tick-mark {
-    -fx-stroke: #888888;
-}
-
-/* Rotate x-axis labels for readability */
-.chart .axis:bottom .axis-tick-mark {
-    -fx-stroke: #888888;
-}
-
-/* Bar chart series colors — classic solid corporate palette */
-/* Series 0: 1080p / primary — steel blue */
-.default-color0.chart-bar {
-    -fx-bar-fill: #2b579a;
-}
-
-/* Series 1: 1440p — teal */
-.default-color1.chart-bar {
-    -fx-bar-fill: #2e8b57;
-}
-
-/* Series 2: 4K — dark goldenrod */
-.default-color2.chart-bar {
-    -fx-bar-fill: #b8860b;
-}
-
-/* Series 3-7 fallback colors */
-.default-color3.chart-bar {
-    -fx-bar-fill: #8b0000;
-}
-.default-color4.chart-bar {
-    -fx-bar-fill: #4b0082;
-}
-.default-color5.chart-bar {
-    -fx-bar-fill: #006400;
-}
-.default-color6.chart-bar {
-    -fx-bar-fill: #8b4513;
-}
-.default-color7.chart-bar {
-    -fx-bar-fill: #483d8b;
-}
-
-/* Legend styling */
-.chart-legend {
-    -fx-background-color: #f0f0f0;
-    -fx-border-color: #a0a0a0;
-    -fx-border-width: 1px;
-    -fx-padding: 4px 8px;
-}
-
-.chart-legend-item {
-    -fx-font-size: 11px;
-    -fx-text-fill: #000000;
-}
-
-/* Legend symbols — square, matching bar colors */
-.default-color0.chart-legend-item-symbol {
-    -fx-background-color: #2b579a;
-    -fx-background-radius: 0;
-}
-.default-color1.chart-legend-item-symbol {
-    -fx-background-color: #2e8b57;
-    -fx-background-radius: 0;
-}
-.default-color2.chart-legend-item-symbol {
-    -fx-background-color: #b8860b;
-    -fx-background-radius: 0;
-}
-.default-color3.chart-legend-item-symbol {
-    -fx-background-color: #8b0000;
-    -fx-background-radius: 0;
-}
-
-/* Head-to-Head Comparison Grid */
-.comparison-winner {
-    -fx-background-color: #d4edda;
-}
-
-.comparison-loser {
-    -fx-background-color: #f8d7da;
+    -fx-background-color: #fee2e2;
+    -fx-text-fill: #b91c1c;
+    -fx-border-color: #fca5a5;
+    -fx-border-radius: 4px;
 }

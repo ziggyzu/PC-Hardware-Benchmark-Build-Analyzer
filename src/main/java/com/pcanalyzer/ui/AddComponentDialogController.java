@@ -57,6 +57,9 @@ public class AddComponentDialogController {
     @FXML private TextField psuWattageField;
     @FXML private TextField psuRatingField;
 
+    // Security Field
+    @FXML private PasswordField adminPasswordField;
+
     @FXML private Label errorLabel;
 
     private ComponentDao componentDao;
@@ -106,6 +109,12 @@ public class AddComponentDialogController {
 
             if (brand.isEmpty() || name.isEmpty()) {
                 throw new IllegalArgumentException("Brand and Model Name are required.");
+            }
+
+            // Security check using PasswordField
+            String passkey = adminPasswordField.getText() != null ? adminPasswordField.getText().trim() : "";
+            if (!passkey.isEmpty() && !passkey.equals("admin123")) {
+                throw new IllegalArgumentException("Invalid Admin Passkey. Enter 'admin123' or leave blank for guest access.");
             }
 
             double price = Double.parseDouble(priceField.getText().trim());

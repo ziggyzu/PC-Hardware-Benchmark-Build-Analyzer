@@ -14,20 +14,25 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.SplitPane;
 import javafx.scene.layout.*;
 
 import java.util.List;
 
 /**
- * Controller for the Performance Comparisons tab (Phase 5).
+ * Controller for the Performance Comparisons tab.
  *
- * Design Decision:
- * 1. Thin Controller: Delegates value calculations to BuildAnalyzer and data retrieval
- *    to ComponentDao. This controller only transforms domain data into chart series.
- * 2. Reactive Updates: Switching category (GPU/CPU) or resolution triggers a full
- *    rebuild of all chart series and the head-to-head selectors.
+ * Demonstrates:
+ * 1. Rich JavaFX UI Design: Nested SplitPanes, TitledPanes, BarCharts, CategoryAxis, NumberAxis, GridPane, ComboBoxes.
+ * 2. Layout Responsiveness: Height and width property constraints relative to parent SplitPanes, and proportional ColumnConstraints.
+ * 3. Reactive Analytics: Auto-refreshes multi-series charts on category or resolution changes.
  */
 public class ComparisonController {
+
+    // Main layout
+    @FXML private VBox comparisonRoot;
+    @FXML private SplitPane verticalSplitPane;
+    @FXML private SplitPane bottomSplitPane;
 
     // Toolbar controls
     @FXML private ComboBox<String> categoryComboBox;
@@ -38,13 +43,11 @@ public class ComparisonController {
     @FXML private BarChart<String, Number> mainBarChart;
     @FXML private CategoryAxis mainXAxis;
     @FXML private NumberAxis mainYAxis;
-    @FXML private Label mainChartTitle;
 
     // Price-to-performance chart
     @FXML private BarChart<String, Number> valueBarChart;
     @FXML private CategoryAxis valueXAxis;
     @FXML private NumberAxis valueYAxis;
-    @FXML private Label valueChartTitle;
 
     // Head-to-head comparison
     @FXML private ComboBox<Component> compareComboA;
@@ -56,17 +59,21 @@ public class ComparisonController {
 
     @FXML
     public void initialize() {
-        // Category selector
+        // 1. Layout Responsiveness: Bind chart minimum heights relative to vertical SplitPane height
+        mainBarChart.minHeightProperty().bind(verticalSplitPane.heightProperty().multiply(0.35));
+        valueBarChart.minHeightProperty().bind(bottomSplitPane.heightProperty().multiply(0.40));
+
+        // 2. Category selector
         categoryComboBox.setItems(FXCollections.observableArrayList("GPU (Graphics Card)", "CPU (Processor)"));
         categoryComboBox.getSelectionModel().selectFirst();
         categoryComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> onCategoryChanged());
 
-        // Resolution selector (GPU-only)
+        // 3. Resolution selector (GPU-only)
         resolutionComboBox.setItems(FXCollections.observableArrayList("1080p (FHD)", "1440p (QHD)", "4K (UHD)"));
         resolutionComboBox.getSelectionModel().selectFirst();
         resolutionComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> refreshCharts());
 
-        // Head-to-head selection listeners
+        // 4. Head-to-head selection listeners
         compareComboA.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> updateHeadToHead());
         compareComboB.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> updateHeadToHead());
     }
@@ -95,8 +102,7 @@ public class ComparisonController {
     }
 
     /**
-     * Rebuilds all chart series and head-to-head selectors based on the current
-     * category and resolution selection.
+     * Rebuilds all chart series and head-to-head selectors based on current category.
      */
     private void refreshCharts() {
         if (componentDao == null) return;
@@ -127,9 +133,9 @@ public class ComparisonController {
 
     private void buildGpuFpsChart(List<Gpu> gpus) {
         mainBarChart.getData().clear();
-        mainChartTitle.setText("GPU Gaming FPS Comparison");
-        mainXAxis.setLabel("GPU");
-        mainYAxis.setLabel("Average FPS");
+        mainBarChart.setTitle("GPU Gaming FPS Comparison (Multi-Resolution)");
+        mainXAxis.setLabel("GPU Model");
+        mainYAxis.setLabel("Average Frames Per Second (FPS)");
 
         XYChart.Series<String, Number> series1080 = new XYChart.Series<>();
         series1080.setName("1080p (FHD)");
@@ -154,9 +160,9 @@ public class ComparisonController {
         String resLabel = resolutionComboBox.getSelectionModel().getSelectedItem();
         if (resLabel == null) resLabel = "1080p";
 
-        valueChartTitle.setText("Price-to-Performance: $/FPS at " + resLabel);
-        valueXAxis.setLabel("GPU");
-        valueYAxis.setLabel("$/FPS (lower is better)");
+        valueBarChart.setTitle("Price-to-Performance ($/FPS at " + resLabel + " — Lower is Better)");
+        valueXAxis.setLabel("GPU Model");
+        valueYAxis.setLabel("USD per FPS");
 
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName("$/FPS");
@@ -178,8 +184,8 @@ public class ComparisonController {
 
     private void buildCpuBenchmarkChart(List<Cpu> cpus) {
         mainBarChart.getData().clear();
-        mainChartTitle.setText("CPU Benchmark Score Comparison");
-        mainXAxis.setLabel("CPU");
+        mainBarChart.setTitle("CPU Multi-Threaded Benchmark Score (Higher is Better)");
+        mainXAxis.setLabel("CPU Model");
         mainYAxis.setLabel("Benchmark Score");
 
         XYChart.Series<String, Number> series = new XYChart.Series<>();
@@ -195,9 +201,9 @@ public class ComparisonController {
 
     private void buildCpuValueChart(List<Cpu> cpus) {
         valueBarChart.getData().clear();
-        valueChartTitle.setText("Price-to-Performance: Points/$ (higher is better)");
-        valueXAxis.setLabel("CPU");
-        valueYAxis.setLabel("Points/$ (higher is better)");
+        valueBarChart.setTitle("CPU Value Efficiency (Points per Dollar — Higher is Better)");
+        valueXAxis.setLabel("CPU Model");
+        valueYAxis.setLabel("Points / USD");
 
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName("Points/$");
@@ -226,7 +232,6 @@ public class ComparisonController {
         compareComboA.setItems(items);
         compareComboB.setItems(items);
 
-        // Restore previous selections if still valid
         if (prevA != null && items.contains(prevA)) {
             compareComboA.getSelectionModel().select(prevA);
         } else if (!items.isEmpty()) {
@@ -250,7 +255,7 @@ public class ComparisonController {
         Component b = compareComboB.getSelectionModel().getSelectedItem();
         if (a == null || b == null) return;
 
-        // Column constraints: Spec | Value A | Value B
+        // Proportional column constraints: Spec (40%), Value A (30%), Value B (30%)
         ColumnConstraints specCol = new ColumnConstraints();
         specCol.setPercentWidth(40);
         ColumnConstraints valACol = new ColumnConstraints();
@@ -293,86 +298,46 @@ public class ComparisonController {
         }
     }
 
-    /**
-     * Adds a header row to the comparison grid.
-     */
     private void addComparisonHeader(int row, String specText, String nameA, String nameB) {
         Label specLabel = new Label(specText);
-        specLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #ffffff;");
+        specLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #1e3a8a;");
         Label labelA = new Label(nameA);
-        labelA.setStyle("-fx-font-weight: bold; -fx-text-fill: #ffffff;");
+        labelA.setStyle("-fx-font-weight: bold; -fx-text-fill: #1e3a8a;");
         labelA.setWrapText(true);
         Label labelB = new Label(nameB);
-        labelB.setStyle("-fx-font-weight: bold; -fx-text-fill: #ffffff;");
+        labelB.setStyle("-fx-font-weight: bold; -fx-text-fill: #1e3a8a;");
         labelB.setWrapText(true);
 
-        HBox headerBox = new HBox();
-        headerBox.setStyle("-fx-background-color: #2b579a; -fx-padding: 4px 6px;");
-        GridPane.setColumnSpan(headerBox, 3);
-
-        // Build a sub-grid inside the header
-        GridPane headerGrid = new GridPane();
-        headerGrid.setHgap(6);
-        ColumnConstraints c1 = new ColumnConstraints();
-        c1.setPercentWidth(40);
-        ColumnConstraints c2 = new ColumnConstraints();
-        c2.setPercentWidth(30);
-        c2.setHalignment(HPos.CENTER);
-        ColumnConstraints c3 = new ColumnConstraints();
-        c3.setPercentWidth(30);
-        c3.setHalignment(HPos.CENTER);
-        headerGrid.getColumnConstraints().addAll(c1, c2, c3);
-        headerGrid.add(specLabel, 0, 0);
-        headerGrid.add(labelA, 1, 0);
-        headerGrid.add(labelB, 2, 0);
-        headerGrid.setMaxWidth(Double.MAX_VALUE);
-        HBox.setHgrow(headerGrid, Priority.ALWAYS);
-
-        headerBox.getChildren().add(headerGrid);
-        comparisonGrid.add(headerBox, 0, row, 3, 1);
+        comparisonGrid.add(specLabel, 0, row);
+        comparisonGrid.add(labelA, 1, row);
+        comparisonGrid.add(labelB, 2, row);
     }
 
-    /**
-     * Adds a data row to the comparison grid with color-coded advantage indicators.
-     *
-     * @param lowerIsBetter If true, the lower numeric value is highlighted as better (e.g. price, power).
-     *                      If false, the higher value is better (e.g. benchmark score, FPS).
-     */
     private int addComparisonRow(int row, String specName, String valueA, String valueB,
                                   double numA, double numB, boolean lowerIsBetter) {
         Label specLabel = new Label(specName);
         specLabel.setStyle("-fx-font-weight: bold;");
-        specLabel.setPadding(new Insets(2, 6, 2, 6));
+        specLabel.setPadding(new Insets(2, 4, 2, 4));
 
         Label labelA = new Label(valueA);
-        labelA.setPadding(new Insets(2, 6, 2, 6));
+        labelA.setPadding(new Insets(2, 4, 2, 4));
         labelA.setMaxWidth(Double.MAX_VALUE);
 
         Label labelB = new Label(valueB);
-        labelB.setPadding(new Insets(2, 6, 2, 6));
+        labelB.setPadding(new Insets(2, 4, 2, 4));
         labelB.setMaxWidth(Double.MAX_VALUE);
 
-        // Color code: green for winner, red for loser (only if values differ)
+        // Highlight winner and loser
         if (numA != numB && numA != 0 && numB != 0) {
-            boolean aWins;
-            if (lowerIsBetter) {
-                aWins = numA < numB;
-            } else {
-                aWins = numA > numB;
-            }
-
+            boolean aWins = lowerIsBetter ? (numA < numB) : (numA > numB);
             if (aWins) {
-                labelA.setStyle(labelA.getStyle() + "-fx-background-color: #d4edda;");
-                labelB.setStyle(labelB.getStyle() + "-fx-background-color: #f8d7da;");
+                labelA.setStyle("-fx-background-color: #dcfce7; -fx-text-fill: #15803d; -fx-font-weight: bold; -fx-background-radius: 3px;");
+                labelB.setStyle("-fx-background-color: #fee2e2; -fx-text-fill: #b91c1c; -fx-background-radius: 3px;");
             } else {
-                labelA.setStyle(labelA.getStyle() + "-fx-background-color: #f8d7da;");
-                labelB.setStyle(labelB.getStyle() + "-fx-background-color: #d4edda;");
+                labelA.setStyle("-fx-background-color: #fee2e2; -fx-text-fill: #b91c1c; -fx-background-radius: 3px;");
+                labelB.setStyle("-fx-background-color: #dcfce7; -fx-text-fill: #15803d; -fx-font-weight: bold; -fx-background-radius: 3px;");
             }
         }
-
-        // Alternating row background
-        String rowBg = (row % 2 == 0) ? "-fx-background-color: #f4f4f4;" : "-fx-background-color: #ffffff;";
-        specLabel.setStyle(specLabel.getStyle() + rowBg);
 
         comparisonGrid.add(specLabel, 0, row);
         comparisonGrid.add(labelA, 1, row);
@@ -381,13 +346,6 @@ public class ComparisonController {
         return row + 1;
     }
 
-    // =====================================================================
-    // Helpers
-    // =====================================================================
-
-    /**
-     * Converts the resolution combo selection to a key string for BuildAnalyzer.
-     */
     private String getSelectedResolutionKey() {
         String selected = resolutionComboBox.getSelectionModel().getSelectedItem();
         if (selected == null) return "1080p";

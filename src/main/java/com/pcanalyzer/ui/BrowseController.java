@@ -3,6 +3,7 @@ package com.pcanalyzer.ui;
 import com.pcanalyzer.db.ComponentDao;
 import com.pcanalyzer.model.Component;
 import com.pcanalyzer.model.ComponentType;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -15,6 +16,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -25,16 +27,25 @@ import java.util.function.Consumer;
 /**
  * Controller for the Hardware Catalog browse and search view.
  *
- * Design Decision:
- * 1. Thin Controller: Coordinates TableView events, delegating DB queries to ComponentDao
- *    and build additions to a Consumer callback (MainController).
- * 2. High-Performance In-Memory Filtering: Uses JavaFX FilteredList and SortedList so typing
- *    in the search box provides instant 60fps filtering without issuing repeated database queries.
+ * Demonstrates:
+ * 1. Rich JavaFX UI Design: SplitPane, FlowPane, Slider, CheckBox, TableView, TitledPane, StackPane, ProgressBar, Tooltips.
+ * 2. Dynamic Layout Responsiveness: TableColumn widths proportionally bound to TableView width via property constraints.
+ * 3. High-Performance Filtering: FilteredList + SortedList reacting to search, sliders, and checkboxes.
  */
 public class BrowseController {
 
+    // Main layout
+    @FXML private SplitPane browseSplitPane;
+
+    // Filters and Toolbar
     @FXML private ComboBox<String> typeFilterComboBox;
     @FXML private TextField searchTextField;
+    @FXML private Slider priceSlider;
+    @FXML private Label priceSliderLabel;
+    @FXML private CheckBox lowTdpCheckBox;
+    @FXML private FlowPane quickFilterFlowPane;
+
+    // Catalog Table
     @FXML private TableView<Component> componentTableView;
     @FXML private TableColumn<Component, Number> idColumn;
     @FXML private TableColumn<Component, String> typeColumn;
@@ -44,9 +55,24 @@ public class BrowseController {
     @FXML private TableColumn<Component, Number> tdpColumn;
     @FXML private TableColumn<Component, String> specsColumn;
 
+    // Bottom Actions
     @FXML private Button addToBuildButton;
     @FXML private Button deleteButton;
     @FXML private Label tableSummaryLabel;
+
+    // Inspector Panel
+    @FXML private StackPane inspectorStackPane;
+    @FXML private VBox inspectorPlaceholder;
+    @FXML private VBox inspectorDetails;
+    @FXML private Label detailTypeLabel;
+    @FXML private Label detailNameLabel;
+    @FXML private Label detailBrandLabel;
+    @FXML private Label detailPriceLabel;
+    @FXML private Label detailTdpLabel;
+    @FXML private Label detailSpecsLabel;
+    @FXML private Label detailTdpPercentLabel;
+    @FXML private ProgressBar tdpProgressBar;
+    @FXML private Button inspectorAddToBuildBtn;
 
     private ComponentDao componentDao;
     private final ObservableList<Component> masterData = FXCollections.observableArrayList();
@@ -56,7 +82,7 @@ public class BrowseController {
 
     @FXML
     public void initialize() {
-        // Configure Table Columns using cell value factories
+        // 1. Configure Table Columns with Value Factories
         idColumn.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getId() != null ? cellData.getValue().getId() : 0));
         typeColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getType().getDisplayName()));
         brandColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getBrand()));
@@ -78,31 +104,47 @@ public class BrowseController {
             }
         });
 
-        // Initialize Filter ComboBox
+        // 2. Dynamic Layout Responsiveness: Bind column widths proportionally to TableView width
+        idColumn.prefWidthProperty().bind(componentTableView.widthProperty().multiply(0.06));
+        typeColumn.prefWidthProperty().bind(componentTableView.widthProperty().multiply(0.12));
+        brandColumn.prefWidthProperty().bind(componentTableView.widthProperty().multiply(0.12));
+        nameColumn.prefWidthProperty().bind(componentTableView.widthProperty().multiply(0.24));
+        priceColumn.prefWidthProperty().bind(componentTableView.widthProperty().multiply(0.11));
+        tdpColumn.prefWidthProperty().bind(componentTableView.widthProperty().multiply(0.08));
+        specsColumn.prefWidthProperty().bind(componentTableView.widthProperty().multiply(0.26));
+
+        // 3. Initialize Filter ComboBox
         typeFilterComboBox.getItems().add("All Categories");
         for (ComponentType type : ComponentType.values()) {
             typeFilterComboBox.getItems().add(type.getDisplayName());
         }
         typeFilterComboBox.getSelectionModel().selectFirst();
 
-        // Setup FilteredList wrapped around masterData
-        filteredData = new FilteredList<>(masterData, p -> true);
+        // 4. Live Property Binding for Slider Label
+        priceSliderLabel.textProperty().bind(
+                Bindings.format("$%.0f", priceSlider.valueProperty())
+        );
 
-        // Listen for filter and search input changes
+        // 5. Setup FilteredList & Listeners
+        filteredData = new FilteredList<>(masterData, p -> true);
         typeFilterComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> updatePredicate());
         searchTextField.textProperty().addListener((obs, oldVal, newVal) -> updatePredicate());
+        priceSlider.valueProperty().addListener((obs, oldVal, newVal) -> updatePredicate());
+        lowTdpCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> updatePredicate());
 
-        // Wrap FilteredList in SortedList to allow column sorting
+        // 6. Wrap in SortedList for interactive column sorting
         SortedList<Component> sortedData = new SortedList<>(filteredData);
         sortedData.comparatorProperty().bind(componentTableView.comparatorProperty());
         componentTableView.setItems(sortedData);
 
-        // Update button states on selection
+        // 7. Selection Listeners for Table & Inspector Card
         componentTableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
             boolean hasSelection = (newSel != null);
             addToBuildButton.setDisable(!hasSelection);
             deleteButton.setDisable(!hasSelection);
+            updateInspector(newSel);
         });
+
         addToBuildButton.setDisable(true);
         deleteButton.setDisable(true);
     }
@@ -133,6 +175,8 @@ public class BrowseController {
     private void updatePredicate() {
         String selectedCategory = typeFilterComboBox.getValue();
         String searchFilter = searchTextField.getText() != null ? searchTextField.getText().trim().toLowerCase() : "";
+        double maxPrice = priceSlider.getValue();
+        boolean lowTdpOnly = lowTdpCheckBox.isSelected();
 
         filteredData.setPredicate(comp -> {
             // Category check
@@ -142,7 +186,17 @@ public class BrowseController {
                 }
             }
 
-            // Search filter check (brand or name or key specs)
+            // Price filter check
+            if (comp.getPrice() > maxPrice) {
+                return false;
+            }
+
+            // Low TDP check (< 100W)
+            if (lowTdpOnly && comp.getTdpWatts() >= 100) {
+                return false;
+            }
+
+            // Search keyword check
             if (!searchFilter.isEmpty()) {
                 boolean matchesBrand = comp.getBrand().toLowerCase().contains(searchFilter);
                 boolean matchesName = comp.getName().toLowerCase().contains(searchFilter);
@@ -156,14 +210,50 @@ public class BrowseController {
         updateSummaryLabel();
     }
 
+    private void updateInspector(Component comp) {
+        if (comp == null) {
+            inspectorPlaceholder.setVisible(true);
+            inspectorDetails.setVisible(false);
+        } else {
+            inspectorPlaceholder.setVisible(false);
+            inspectorDetails.setVisible(true);
+
+            detailTypeLabel.setText(comp.getType().getDisplayName().toUpperCase());
+            detailNameLabel.setText(comp.getName());
+            detailBrandLabel.setText("Brand: " + comp.getBrand());
+            detailPriceLabel.setText(String.format("$%.2f", comp.getPrice()));
+            detailTdpLabel.setText(comp.getTdpWatts() + " W");
+            detailSpecsLabel.setText(comp.getKeySpecs());
+
+            // Relative TDP power draw progress (compared against high-end 350W target)
+            double tdpRatio = Math.min(1.0, (double) comp.getTdpWatts() / 350.0);
+            tdpProgressBar.setProgress(tdpRatio);
+            detailTdpPercentLabel.setText(String.format("%.0f%%", tdpRatio * 100));
+        }
+    }
+
     private void updateSummaryLabel() {
         tableSummaryLabel.setText(String.format("Showing %d of %d components", filteredData.size(), masterData.size()));
+    }
+
+    // Quick tag handlers
+    @FXML private void handleQuickFilterAll() { typeFilterComboBox.getSelectionModel().select(0); }
+    @FXML private void handleQuickFilterCpu() { selectCategory(ComponentType.CPU.getDisplayName()); }
+    @FXML private void handleQuickFilterGpu() { selectCategory(ComponentType.GPU.getDisplayName()); }
+    @FXML private void handleQuickFilterMobo() { selectCategory(ComponentType.MOTHERBOARD.getDisplayName()); }
+    @FXML private void handleQuickFilterRam() { selectCategory(ComponentType.RAM.getDisplayName()); }
+    @FXML private void handleQuickFilterPsu() { selectCategory(ComponentType.PSU.getDisplayName()); }
+
+    private void selectCategory(String displayName) {
+        typeFilterComboBox.getSelectionModel().select(displayName);
     }
 
     @FXML
     private void handleResetFilters() {
         typeFilterComboBox.getSelectionModel().selectFirst();
         searchTextField.clear();
+        priceSlider.setValue(1000.0);
+        lowTdpCheckBox.setSelected(false);
     }
 
     @FXML
@@ -198,6 +288,7 @@ public class BrowseController {
                 if (success) {
                     masterData.remove(selected);
                     updateSummaryLabel();
+                    updateInspector(null);
                     if (onStatusMessageCallback != null) {
                         onStatusMessageCallback.accept("Deleted " + selected.getName() + ".");
                     }

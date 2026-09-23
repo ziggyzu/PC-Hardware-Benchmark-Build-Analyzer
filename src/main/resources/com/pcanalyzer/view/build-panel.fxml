@@ -4,126 +4,191 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<ScrollPane xmlns="http://javafx.com/javafx/21"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.pcanalyzer.ui.BuildPanelController"
-            fitToWidth="true" style="-fx-background-color: #f0f0f0;">
+<SplitPane xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:id="buildSplitPane"
+           fx:controller="com.pcanalyzer.ui.BuildPanelController"
+           dividerPositions="0.58">
 
-    <HBox spacing="20.0" style="-fx-background-color: #f0f0f0;">
-        <padding>
-            <Insets top="20.0" right="20.0" bottom="20.0" left="20.0"/>
-        </padding>
+    <!-- Left Side: Installed Build Components (Using Accordion & TitledPanes) -->
+    <ScrollPane fitToWidth="true">
+        <VBox spacing="12.0">
+            <padding>
+                <Insets top="14.0" right="14.0" bottom="14.0" left="14.0"/>
+            </padding>
 
-        <!-- Left Column: Component Slots -->
-        <VBox spacing="14.0" HBox.hgrow="ALWAYS" prefWidth="640.0">
-            <Label text="Installed Build Components" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2b579a;"/>
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                <Label text="Installed Build Components" styleClass="app-title" style="-fx-font-size: 16px;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Expand All Slots" onAction="#handleExpandAll" style="-fx-font-size: 11px;"/>
+                <Button text="Clear Build" onAction="#handleClearBuild" styleClass="btn-danger" style="-fx-font-size: 11px;"/>
+            </HBox>
 
-            <!-- CPU Slot -->
-            <VBox styleClass="card" spacing="6.0">
-                <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="card-header">
-                    <Label text="Processor (CPU)" styleClass="card-title"/>
-                    <Region HBox.hgrow="ALWAYS"/>
-                    <Label fx:id="cpuPriceLabel" text="\$0.00" style="-fx-font-weight: bold; -fx-text-fill: #2b579a;"/>
-                    <Button text="Remove" onAction="#handleRemoveCpu" styleClass="btn-secondary" style="-fx-font-size: 11px; -fx-padding: 4px 10px;"/>
-                </HBox>
-                <Label fx:id="cpuNameLabel" text="No CPU selected" style="-fx-font-size: 14px; -fx-text-fill: #000000;"/>
-                <Label fx:id="cpuSpecsLabel" text="Select a CPU from the Hardware Catalog" style="-fx-text-fill: #333333;"/>
-            </VBox>
+            <!-- Accordion containing hardware component slots -->
+            <Accordion fx:id="componentsAccordion">
+                <panes>
+                    <!-- CPU Slot -->
+                    <TitledPane fx:id="cpuTitledPane" text="Processor (CPU) — None Selected" expanded="true">
+                        <VBox spacing="8.0" style="-fx-padding: 10px;">
+                            <HBox alignment="CENTER_LEFT" spacing="8.0">
+                                <Label fx:id="cpuNameLabel" text="No CPU selected" style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Label fx:id="cpuPriceLabel" text="\$0.00" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2563eb;"/>
+                                <Button text="Remove" onAction="#handleRemoveCpu" styleClass="btn-secondary" style="-fx-font-size: 10px;"/>
+                            </HBox>
+                            <Label fx:id="cpuSpecsLabel" text="Select a CPU from the Hardware Catalog" style="-fx-text-fill: #64748b;"/>
+                        </VBox>
+                    </TitledPane>
 
-            <!-- Motherboard Slot -->
-            <VBox styleClass="card" spacing="6.0">
-                <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="card-header">
-                    <Label text="Motherboard" styleClass="card-title"/>
-                    <Region HBox.hgrow="ALWAYS"/>
-                    <Label fx:id="moboPriceLabel" text="\$0.00" style="-fx-font-weight: bold; -fx-text-fill: #2b579a;"/>
-                    <Button text="Remove" onAction="#handleRemoveMotherboard" styleClass="btn-secondary" style="-fx-font-size: 11px; -fx-padding: 4px 10px;"/>
-                </HBox>
-                <Label fx:id="moboNameLabel" text="No Motherboard selected" style="-fx-font-size: 14px; -fx-text-fill: #000000;"/>
-                <Label fx:id="moboSpecsLabel" text="Select a Motherboard from the Hardware Catalog" style="-fx-text-fill: #333333;"/>
-            </VBox>
+                    <!-- Motherboard Slot -->
+                    <TitledPane fx:id="moboTitledPane" text="Motherboard — None Selected" expanded="true">
+                        <VBox spacing="8.0" style="-fx-padding: 10px;">
+                            <HBox alignment="CENTER_LEFT" spacing="8.0">
+                                <Label fx:id="moboNameLabel" text="No Motherboard selected" style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Label fx:id="moboPriceLabel" text="\$0.00" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2563eb;"/>
+                                <Button text="Remove" onAction="#handleRemoveMotherboard" styleClass="btn-secondary" style="-fx-font-size: 10px;"/>
+                            </HBox>
+                            <Label fx:id="moboSpecsLabel" text="Select a Motherboard from the Hardware Catalog" style="-fx-text-fill: #64748b;"/>
+                        </VBox>
+                    </TitledPane>
 
-            <!-- RAM Slot -->
-            <VBox styleClass="card" spacing="6.0">
-                <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="card-header">
-                    <Label text="Memory (RAM)" styleClass="card-title"/>
-                    <Region HBox.hgrow="ALWAYS"/>
-                    <Label fx:id="ramPriceLabel" text="\$0.00" style="-fx-font-weight: bold; -fx-text-fill: #2b579a;"/>
-                    <Button text="Remove" onAction="#handleRemoveRam" styleClass="btn-secondary" style="-fx-font-size: 11px; -fx-padding: 4px 10px;"/>
-                </HBox>
-                <Label fx:id="ramNameLabel" text="No RAM selected" style="-fx-font-size: 14px; -fx-text-fill: #000000;"/>
-                <Label fx:id="ramSpecsLabel" text="Select RAM from the Hardware Catalog" style="-fx-text-fill: #333333;"/>
-            </VBox>
+                    <!-- RAM Slot -->
+                    <TitledPane fx:id="ramTitledPane" text="Memory (RAM) — None Selected" expanded="true">
+                        <VBox spacing="8.0" style="-fx-padding: 10px;">
+                            <HBox alignment="CENTER_LEFT" spacing="8.0">
+                                <Label fx:id="ramNameLabel" text="No RAM selected" style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Label fx:id="ramPriceLabel" text="\$0.00" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2563eb;"/>
+                                <Button text="Remove" onAction="#handleRemoveRam" styleClass="btn-secondary" style="-fx-font-size: 10px;"/>
+                            </HBox>
+                            <Label fx:id="ramSpecsLabel" text="Select RAM from the Hardware Catalog" style="-fx-text-fill: #64748b;"/>
+                        </VBox>
+                    </TitledPane>
 
-            <!-- GPU Slot -->
-            <VBox styleClass="card" spacing="6.0">
-                <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="card-header">
-                    <Label text="Graphics Card (GPU)" styleClass="card-title"/>
-                    <Region HBox.hgrow="ALWAYS"/>
-                    <Label fx:id="gpuPriceLabel" text="\$0.00" style="-fx-font-weight: bold; -fx-text-fill: #2b579a;"/>
-                    <Button text="Remove" onAction="#handleRemoveGpu" styleClass="btn-secondary" style="-fx-font-size: 11px; -fx-padding: 4px 10px;"/>
-                </HBox>
-                <Label fx:id="gpuNameLabel" text="No GPU selected" style="-fx-font-size: 14px; -fx-text-fill: #000000;"/>
-                <Label fx:id="gpuSpecsLabel" text="Select a GPU from the Hardware Catalog" style="-fx-text-fill: #333333;"/>
-            </VBox>
+                    <!-- GPU Slot -->
+                    <TitledPane fx:id="gpuTitledPane" text="Graphics Card (GPU) — None Selected" expanded="true">
+                        <VBox spacing="8.0" style="-fx-padding: 10px;">
+                            <HBox alignment="CENTER_LEFT" spacing="8.0">
+                                <Label fx:id="gpuNameLabel" text="No GPU selected" style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Label fx:id="gpuPriceLabel" text="\$0.00" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2563eb;"/>
+                                <Button text="Remove" onAction="#handleRemoveGpu" styleClass="btn-secondary" style="-fx-font-size: 10px;"/>
+                            </HBox>
+                            <Label fx:id="gpuSpecsLabel" text="Select a GPU from the Hardware Catalog" style="-fx-text-fill: #64748b;"/>
+                        </VBox>
+                    </TitledPane>
 
-            <!-- PSU Slot -->
-            <VBox styleClass="card" spacing="6.0">
-                <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="card-header">
-                    <Label text="Power Supply (PSU)" styleClass="card-title"/>
-                    <Region HBox.hgrow="ALWAYS"/>
-                    <Label fx:id="psuPriceLabel" text="\$0.00" style="-fx-font-weight: bold; -fx-text-fill: #2b579a;"/>
-                    <Button text="Remove" onAction="#handleRemovePsu" styleClass="btn-secondary" style="-fx-font-size: 11px; -fx-padding: 4px 10px;"/>
-                </HBox>
-                <Label fx:id="psuNameLabel" text="No PSU selected" style="-fx-font-size: 14px; -fx-text-fill: #000000;"/>
-                <Label fx:id="psuSpecsLabel" text="Select a PSU from the Hardware Catalog" style="-fx-text-fill: #333333;"/>
-            </VBox>
+                    <!-- PSU Slot -->
+                    <TitledPane fx:id="psuTitledPane" text="Power Supply (PSU) — None Selected" expanded="true">
+                        <VBox spacing="8.0" style="-fx-padding: 10px;">
+                            <HBox alignment="CENTER_LEFT" spacing="8.0">
+                                <Label fx:id="psuNameLabel" text="No PSU selected" style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Label fx:id="psuPriceLabel" text="\$0.00" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2563eb;"/>
+                                <Button text="Remove" onAction="#handleRemovePsu" styleClass="btn-secondary" style="-fx-font-size: 10px;"/>
+                            </HBox>
+                            <Label fx:id="psuSpecsLabel" text="Select a PSU from the Hardware Catalog" style="-fx-text-fill: #64748b;"/>
+                        </VBox>
+                    </TitledPane>
+                </panes>
+            </Accordion>
         </VBox>
+    </ScrollPane>
 
-        <!-- Right Column: Summary & Compatibility Diagnostics -->
-        <VBox spacing="16.0" prefWidth="440.0">
-            <Label text="Build Analysis &amp; Summary" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2b579a;"/>
+    <!-- Right Side: Build Analysis, Real-time Power & Compatibility Diagnostics -->
+    <ScrollPane fitToWidth="true">
+        <VBox spacing="14.0">
+            <padding>
+                <Insets top="14.0" right="14.0" bottom="14.0" left="14.0"/>
+            </padding>
 
-            <!-- Financial & Power Stats Card -->
-            <VBox styleClass="card" spacing="14.0">
-                <VBox spacing="4.0">
-                    <Label text="TOTAL BUILD PRICE" styleClass="stat-label"/>
-                    <Label fx:id="totalPriceLabel" text="\$0.00" styleClass="stat-value"/>
+            <Label text="Build Analysis &amp; Diagnostics" styleClass="app-title" style="-fx-font-size: 16px;"/>
+
+            <!-- Financial Summary & Target Budget Slider -->
+            <TitledPane text="Financial &amp; Budget Tracker" collapsible="false">
+                <VBox spacing="10.0" style="-fx-padding: 10px;">
+                    <HBox alignment="CENTER_LEFT">
+                        <VBox spacing="2.0">
+                            <Label text="TOTAL BUILD COST" styleClass="stat-label"/>
+                            <Label fx:id="totalPriceLabel" text="\$0.00" styleClass="stat-value"/>
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <VBox alignment="CENTER_RIGHT" spacing="2.0">
+                            <Label text="BUDGET CEILING" styleClass="stat-label"/>
+                            <Label fx:id="budgetValueLabel" text="\$1500" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2563eb;"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- Budget Utilization Bar & Slider -->
+                    <VBox spacing="4.0">
+                        <HBox alignment="CENTER_LEFT">
+                            <Label text="Budget Used:" style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="budgetPercentLabel" text="0%" style="-fx-font-size: 11px; -fx-font-weight: bold;"/>
+                        </HBox>
+                        <ProgressBar fx:id="budgetProgressBar" progress="0.0" maxWidth="Infinity"/>
+                    </VBox>
+
+                    <HBox alignment="CENTER_LEFT" spacing="8.0">
+                        <Label text="Set Budget Limit:" style="-fx-font-size: 11px; -fx-font-weight: bold;"/>
+                        <Slider fx:id="budgetSlider" min="300" max="4000" value="1500" HBox.hgrow="ALWAYS"/>
+                    </HBox>
                 </VBox>
+            </TitledPane>
 
-                <Separator style="-fx-opacity: 0.3;"/>
+            <!-- Power Draw & PSU Utilization Meter -->
+            <TitledPane text="Power Analysis &amp; PSU Headroom" collapsible="false">
+                <VBox spacing="10.0" style="-fx-padding: 10px;">
+                    <GridPane hgap="12.0" vgap="8.0">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="50.0"/>
+                            <ColumnConstraints percentWidth="50.0"/>
+                        </columnConstraints>
 
-                <GridPane hgap="16.0" vgap="10.0">
-                    <VBox GridPane.columnIndex="0" GridPane.rowIndex="0">
-                        <Label text="RAW TDP" styleClass="stat-label"/>
-                        <Label fx:id="totalTdpLabel" text="0 W" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #000000;"/>
+                        <VBox GridPane.columnIndex="0" GridPane.rowIndex="0">
+                            <Label text="BASE TDP POWER" styleClass="stat-label"/>
+                            <Label fx:id="totalTdpLabel" text="0 W" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                        </VBox>
+                        <VBox GridPane.columnIndex="1" GridPane.rowIndex="0">
+                            <Label text="ESTIMATED PEAK" styleClass="stat-label"/>
+                            <Label fx:id="estimatedPeakLabel" text="70 W" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                        </VBox>
+                        <VBox GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.columnSpan="2">
+                            <Label text="RECOMMENDED PSU" styleClass="stat-label"/>
+                            <Label fx:id="recommendedPsuLabel" text="84 W (+20% Headroom)" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2563eb;"/>
+                        </VBox>
+                    </GridPane>
+
+                    <Separator/>
+
+                    <!-- PSU Power Utilization Meter -->
+                    <VBox spacing="4.0">
+                        <HBox alignment="CENTER_LEFT">
+                            <Label text="PSU Capacity Utilization:" style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="psuLoadPercentLabel" text="0%" style="-fx-font-size: 11px; -fx-font-weight: bold;"/>
+                        </HBox>
+                        <ProgressBar fx:id="psuLoadProgressBar" progress="0.0" maxWidth="Infinity"/>
                     </VBox>
-                    <VBox GridPane.columnIndex="1" GridPane.rowIndex="0">
-                        <Label text="ESTIMATED PEAK" styleClass="stat-label"/>
-                        <Label fx:id="estimatedPeakLabel" text="70 W" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #000000;"/>
-                    </VBox>
-                    <VBox GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.columnSpan="2">
-                        <Label text="RECOMMENDED MINIMUM PSU" styleClass="stat-label"/>
-                        <Label fx:id="recommendedPsuLabel" text="84 W (+20% Headroom)" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2b579a;"/>
-                    </VBox>
-                </GridPane>
-            </VBox>
+
+                    <CheckBox fx:id="overclockHeadroomCheckBox" text="Add 15% Overclocking Headroom" selected="false"/>
+                </VBox>
+            </TitledPane>
 
             <!-- Compatibility Status Card -->
-            <VBox styleClass="card" spacing="10.0" VBox.vgrow="ALWAYS">
-                <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="card-header">
-                    <Label text="COMPATIBILITY STATUS" styleClass="stat-label"/>
-                    <Region HBox.hgrow="ALWAYS"/>
-                    <Label fx:id="compatibilityBadge" text="Compatible" styleClass="badge, badge-compatible"/>
-                </HBox>
+            <TitledPane text="Real-Time Compatibility Status" collapsible="false" VBox.vgrow="ALWAYS">
+                <VBox spacing="10.0" style="-fx-padding: 10px;">
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                        <Label text="OVERALL STATUS:" styleClass="stat-label"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="compatibilityBadge" text="Compatible" styleClass="badge, badge-compatible"/>
+                    </HBox>
 
-                <Label text="Diagnostic Checks:" style="-fx-font-weight: bold; -fx-text-fill: #333333;"/>
-                <ListView fx:id="diagnosticListView" prefHeight="180.0" style="-fx-background-color: #f0f0f0; -fx-border-color: #a0a0a0; -fx-border-radius: 6px;"/>
-            </VBox>
-
-            <!-- Action Buttons -->
-            <HBox spacing="12.0">
-                <Button text="Clear All Components" onAction="#handleClearBuild" styleClass="btn-danger" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
-            </HBox>
+                    <Label text="Diagnostic Rule Checks:" style="-fx-font-weight: bold; -fx-font-size: 11px;"/>
+                    <ListView fx:id="diagnosticListView" prefHeight="160.0"/>
+                </VBox>
+            </TitledPane>
         </VBox>
-    </HBox>
-</ScrollPane>
+    </ScrollPane>
+</SplitPane>

@@ -4,142 +4,154 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox xmlns="http://javafx.com/javafx/21"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.pcanalyzer.ui.AddComponentDialogController"
-      spacing="14.0" style="-fx-background-color: #f0f0f0; -fx-padding: 20px;"
-      prefWidth="520.0">
+<ScrollPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.pcanalyzer.ui.AddComponentDialogController"
+            fitToWidth="true" prefWidth="540.0" prefHeight="580.0">
 
-    <Label text="Add New Hardware Component" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2b579a;"/>
-    <Label text="Specify standard attributes and category-specific hardware properties." style="-fx-text-fill: #333333;"/>
+    <VBox spacing="14.0" style="-fx-padding: 20px;">
+        <Label text="Add New Hardware Component" styleClass="app-title"/>
+        <Label text="Specify standard attributes, category-specific properties, and authorization." styleClass="app-subtitle"/>
 
-    <Separator style="-fx-opacity: 0.3;"/>
+        <Separator/>
 
-    <!-- Common Attributes -->
-    <GridPane hgap="12.0" vgap="10.0">
-        <columnConstraints>
-            <ColumnConstraints minWidth="120.0" prefWidth="130.0"/>
-            <ColumnConstraints hgrow="ALWAYS"/>
-        </columnConstraints>
-
-        <Label text="Component Type:" GridPane.columnIndex="0" GridPane.rowIndex="0" style="-fx-text-fill: #333333;"/>
-        <ComboBox fx:id="typeComboBox" prefWidth="250.0" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-
-        <Label text="Brand / Vendor:" GridPane.columnIndex="0" GridPane.rowIndex="1" style="-fx-text-fill: #333333;"/>
-        <TextField fx:id="brandField" promptText="e.g. AMD, Intel, NVIDIA, ASUS" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-
-        <Label text="Model Name:" GridPane.columnIndex="0" GridPane.rowIndex="2" style="-fx-text-fill: #333333;"/>
-        <TextField fx:id="nameField" promptText="e.g. Ryzen 7 7700X, RTX 4070" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-
-        <Label text="Price (USD):" GridPane.columnIndex="0" GridPane.rowIndex="3" style="-fx-text-fill: #333333;"/>
-        <TextField fx:id="priceField" promptText="e.g. 299.99" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
-
-        <Label text="TDP (Watts):" GridPane.columnIndex="0" GridPane.rowIndex="4" style="-fx-text-fill: #333333;"/>
-        <TextField fx:id="tdpField" promptText="e.g. 65 or 125" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
-    </GridPane>
-
-    <Separator style="-fx-opacity: 0.3;"/>
-
-    <!-- Category Specific Forms (Switched dynamically) -->
-    <StackPane fx:id="specFormContainer">
-        <!-- CPU Spec Form -->
-        <GridPane fx:id="cpuForm" hgap="12.0" vgap="10.0">
+        <!-- Common Attributes (GridPane Layout) -->
+        <GridPane hgap="12.0" vgap="10.0">
             <columnConstraints>
-                <ColumnConstraints minWidth="120.0" prefWidth="130.0"/>
+                <ColumnConstraints minWidth="130.0" prefWidth="140.0"/>
                 <ColumnConstraints hgrow="ALWAYS"/>
             </columnConstraints>
-            <Label text="Socket Standard:" GridPane.columnIndex="0" GridPane.rowIndex="0" style="-fx-text-fill: #333333;"/>
-            <TextField fx:id="cpuSocketField" promptText="e.g. AM5, LGA1700, AM4" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
 
-            <Label text="Cores / Threads:" GridPane.columnIndex="0" GridPane.rowIndex="1" style="-fx-text-fill: #333333;"/>
-            <HBox spacing="8.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                <TextField fx:id="cpuCoresField" promptText="Cores (e.g. 8)" HBox.hgrow="ALWAYS"/>
-                <TextField fx:id="cpuThreadsField" promptText="Threads (e.g. 16)" HBox.hgrow="ALWAYS"/>
-            </HBox>
+            <Label text="Component Type:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+            <ComboBox fx:id="typeComboBox" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
 
-            <Label text="Clocks (Base / Boost):" GridPane.columnIndex="0" GridPane.rowIndex="2" style="-fx-text-fill: #333333;"/>
-            <HBox spacing="8.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                <TextField fx:id="cpuBaseClockField" promptText="Base GHz (e.g. 3.8)" HBox.hgrow="ALWAYS"/>
-                <TextField fx:id="cpuBoostClockField" promptText="Boost GHz (e.g. 5.1)" HBox.hgrow="ALWAYS"/>
-            </HBox>
+            <Label text="Brand / Vendor:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+            <TextField fx:id="brandField" promptText="e.g. AMD, Intel, NVIDIA, ASUS" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
 
-            <Label text="Benchmark Score:" GridPane.columnIndex="0" GridPane.rowIndex="3" style="-fx-text-fill: #333333;"/>
-            <TextField fx:id="cpuScoreField" promptText="e.g. 27500" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+            <Label text="Model Name:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+            <TextField fx:id="nameField" promptText="e.g. Ryzen 7 7700X, RTX 4070" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+            <Label text="Price (USD):" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+            <TextField fx:id="priceField" promptText="e.g. 299.99" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+
+            <Label text="TDP (Watts):" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+            <TextField fx:id="tdpField" promptText="e.g. 65 or 125" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
         </GridPane>
 
-        <!-- GPU Spec Form -->
-        <GridPane fx:id="gpuForm" hgap="12.0" vgap="10.0" visible="false">
+        <Separator/>
+
+        <!-- Category Specific Forms (Switched dynamically inside StackPane) -->
+        <StackPane fx:id="specFormContainer">
+            <!-- CPU Spec Form -->
+            <GridPane fx:id="cpuForm" hgap="12.0" vgap="10.0">
+                <columnConstraints>
+                    <ColumnConstraints minWidth="130.0" prefWidth="140.0"/>
+                    <ColumnConstraints hgrow="ALWAYS"/>
+                </columnConstraints>
+                <Label text="Socket Standard:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                <TextField fx:id="cpuSocketField" promptText="e.g. AM5, LGA1700, AM4" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                <Label text="Cores / Threads:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                <HBox spacing="8.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                    <TextField fx:id="cpuCoresField" promptText="Cores (e.g. 8)" HBox.hgrow="ALWAYS"/>
+                    <TextField fx:id="cpuThreadsField" promptText="Threads (e.g. 16)" HBox.hgrow="ALWAYS"/>
+                </HBox>
+
+                <Label text="Clocks (Base / Boost):" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                <HBox spacing="8.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                    <TextField fx:id="cpuBaseClockField" promptText="Base GHz (e.g. 3.8)" HBox.hgrow="ALWAYS"/>
+                    <TextField fx:id="cpuBoostClockField" promptText="Boost GHz (e.g. 5.1)" HBox.hgrow="ALWAYS"/>
+                </HBox>
+
+                <Label text="Benchmark Score:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                <TextField fx:id="cpuScoreField" promptText="e.g. 27500" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+            </GridPane>
+
+            <!-- GPU Spec Form -->
+            <GridPane fx:id="gpuForm" hgap="12.0" vgap="10.0" visible="false">
+                <columnConstraints>
+                    <ColumnConstraints minWidth="130.0" prefWidth="140.0"/>
+                    <ColumnConstraints hgrow="ALWAYS"/>
+                </columnConstraints>
+                <Label text="VRAM (GB):" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                <TextField fx:id="gpuVramField" promptText="e.g. 8, 12, 16" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                <Label text="Power (Board / Rec):" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                <HBox spacing="8.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                    <TextField fx:id="gpuBoardPowerField" promptText="Board Watts (e.g. 200)" HBox.hgrow="ALWAYS"/>
+                    <TextField fx:id="gpuRecPsuField" promptText="Rec. PSU W (e.g. 650)" HBox.hgrow="ALWAYS"/>
+                </HBox>
+
+                <Label text="FPS (1080p/1440p/4K):" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                <HBox spacing="8.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                    <TextField fx:id="gpuFps1080Field" promptText="1080p (e.g. 110)" HBox.hgrow="ALWAYS"/>
+                    <TextField fx:id="gpuFps1440Field" promptText="1440p (e.g. 75)" HBox.hgrow="ALWAYS"/>
+                    <TextField fx:id="gpuFps4kField" promptText="4K (e.g. 40)" HBox.hgrow="ALWAYS"/>
+                </HBox>
+            </GridPane>
+
+            <!-- Motherboard Spec Form -->
+            <GridPane fx:id="moboForm" hgap="12.0" vgap="10.0" visible="false">
+                <columnConstraints>
+                    <ColumnConstraints minWidth="130.0" prefWidth="140.0"/>
+                    <ColumnConstraints hgrow="ALWAYS"/>
+                </columnConstraints>
+                <Label text="Socket Standard:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                <TextField fx:id="moboSocketField" promptText="e.g. AM5, LGA1700, AM4" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                <Label text="RAM Support:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                <TextField fx:id="moboRamField" promptText="e.g. DDR5, DDR4" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+            </GridPane>
+
+            <!-- RAM Spec Form -->
+            <GridPane fx:id="ramForm" hgap="12.0" vgap="10.0" visible="false">
+                <columnConstraints>
+                    <ColumnConstraints minWidth="130.0" prefWidth="140.0"/>
+                    <ColumnConstraints hgrow="ALWAYS"/>
+                </columnConstraints>
+                <Label text="RAM Standard:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                <TextField fx:id="ramTypeField" promptText="e.g. DDR5, DDR4" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                <Label text="Capacity (GB):" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                <TextField fx:id="ramCapacityField" promptText="e.g. 16, 32" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                <Label text="Speed (MHz):" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                <TextField fx:id="ramSpeedField" promptText="e.g. 3200, 6000" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+            </GridPane>
+
+            <!-- PSU Spec Form -->
+            <GridPane fx:id="psuForm" hgap="12.0" vgap="10.0" visible="false">
+                <columnConstraints>
+                    <ColumnConstraints minWidth="130.0" prefWidth="140.0"/>
+                    <ColumnConstraints hgrow="ALWAYS"/>
+                </columnConstraints>
+                <Label text="Rated Wattage (W):" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                <TextField fx:id="psuWattageField" promptText="e.g. 650, 750, 850" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                <Label text="Efficiency Rating:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                <TextField fx:id="psuRatingField" promptText="e.g. 80+ Bronze, 80+ Gold" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+            </GridPane>
+        </StackPane>
+
+        <Separator/>
+
+        <!-- Security / Authorization (Showcasing PasswordField) -->
+        <GridPane hgap="12.0" vgap="8.0">
             <columnConstraints>
-                <ColumnConstraints minWidth="120.0" prefWidth="130.0"/>
+                <ColumnConstraints minWidth="130.0" prefWidth="140.0"/>
                 <ColumnConstraints hgrow="ALWAYS"/>
             </columnConstraints>
-            <Label text="VRAM (GB):" GridPane.columnIndex="0" GridPane.rowIndex="0" style="-fx-text-fill: #333333;"/>
-            <TextField fx:id="gpuVramField" promptText="e.g. 8, 12, 16" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-
-            <Label text="Power (Board / Rec):" GridPane.columnIndex="0" GridPane.rowIndex="1" style="-fx-text-fill: #333333;"/>
-            <HBox spacing="8.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                <TextField fx:id="gpuBoardPowerField" promptText="Board Watts (e.g. 200)" HBox.hgrow="ALWAYS"/>
-                <TextField fx:id="gpuRecPsuField" promptText="Rec. PSU W (e.g. 650)" HBox.hgrow="ALWAYS"/>
-            </HBox>
-
-            <Label text="FPS (1080p/1440p/4K):" GridPane.columnIndex="0" GridPane.rowIndex="2" style="-fx-text-fill: #333333;"/>
-            <HBox spacing="8.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                <TextField fx:id="gpuFps1080Field" promptText="1080p (e.g. 110)" HBox.hgrow="ALWAYS"/>
-                <TextField fx:id="gpuFps1440Field" promptText="1440p (e.g. 75)" HBox.hgrow="ALWAYS"/>
-                <TextField fx:id="gpuFps4kField" promptText="4K (e.g. 40)" HBox.hgrow="ALWAYS"/>
-            </HBox>
+            <Label text="Admin Passkey:" GridPane.columnIndex="0" GridPane.rowIndex="0" style="-fx-font-weight: bold;"/>
+            <PasswordField fx:id="adminPasswordField" promptText="Enter passkey (default: admin123)" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
         </GridPane>
 
-        <!-- Motherboard Spec Form -->
-        <GridPane fx:id="moboForm" hgap="12.0" vgap="10.0" visible="false">
-            <columnConstraints>
-                <ColumnConstraints minWidth="120.0" prefWidth="130.0"/>
-                <ColumnConstraints hgrow="ALWAYS"/>
-            </columnConstraints>
-            <Label text="Socket Standard:" GridPane.columnIndex="0" GridPane.rowIndex="0" style="-fx-text-fill: #333333;"/>
-            <TextField fx:id="moboSocketField" promptText="e.g. AM5, LGA1700, AM4" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+        <!-- Error message display -->
+        <Label fx:id="errorLabel" text="" style="-fx-text-fill: #dc2626; -fx-font-weight: bold;" wrapText="true"/>
 
-            <Label text="RAM Support:" GridPane.columnIndex="0" GridPane.rowIndex="1" style="-fx-text-fill: #333333;"/>
-            <TextField fx:id="moboRamField" promptText="e.g. DDR5, DDR4" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-        </GridPane>
-
-        <!-- RAM Spec Form -->
-        <GridPane fx:id="ramForm" hgap="12.0" vgap="10.0" visible="false">
-            <columnConstraints>
-                <ColumnConstraints minWidth="120.0" prefWidth="130.0"/>
-                <ColumnConstraints hgrow="ALWAYS"/>
-            </columnConstraints>
-            <Label text="RAM Standard:" GridPane.columnIndex="0" GridPane.rowIndex="0" style="-fx-text-fill: #333333;"/>
-            <TextField fx:id="ramTypeField" promptText="e.g. DDR5, DDR4" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-
-            <Label text="Capacity (GB):" GridPane.columnIndex="0" GridPane.rowIndex="1" style="-fx-text-fill: #333333;"/>
-            <TextField fx:id="ramCapacityField" promptText="e.g. 16, 32" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-
-            <Label text="Speed (MHz):" GridPane.columnIndex="0" GridPane.rowIndex="2" style="-fx-text-fill: #333333;"/>
-            <TextField fx:id="ramSpeedField" promptText="e.g. 3200, 6000" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-        </GridPane>
-
-        <!-- PSU Spec Form -->
-        <GridPane fx:id="psuForm" hgap="12.0" vgap="10.0" visible="false">
-            <columnConstraints>
-                <ColumnConstraints minWidth="120.0" prefWidth="130.0"/>
-                <ColumnConstraints hgrow="ALWAYS"/>
-            </columnConstraints>
-            <Label text="Rated Wattage (W):" GridPane.columnIndex="0" GridPane.rowIndex="0" style="-fx-text-fill: #333333;"/>
-            <TextField fx:id="psuWattageField" promptText="e.g. 650, 750, 850" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-
-            <Label text="Efficiency Rating:" GridPane.columnIndex="0" GridPane.rowIndex="1" style="-fx-text-fill: #333333;"/>
-            <TextField fx:id="psuRatingField" promptText="e.g. 80+ Bronze, 80+ Gold" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-        </GridPane>
-    </StackPane>
-
-    <!-- Error message display -->
-    <Label fx:id="errorLabel" text="" style="-fx-text-fill: #ef4444; -fx-font-weight: bold;" wrapText="true"/>
-
-    <!-- Bottom Buttons -->
-    <HBox alignment="CENTER_RIGHT" spacing="12.0">
-        <Button text="Cancel" onAction="#handleCancel" styleClass="btn-secondary"/>
-        <Button text="Save Component" onAction="#handleSave" styleClass="btn-primary"/>
-    </HBox>
-
-</VBox>
+        <!-- Bottom Buttons -->
+        <HBox alignment="CENTER_RIGHT" spacing="12.0">
+            <Button text="Cancel" onAction="#handleCancel" styleClass="btn-secondary"/>
+            <Button text="Save Component" onAction="#handleSave" styleClass="btn-primary"/>
+        </HBox>
+    </VBox>
+</ScrollPane>

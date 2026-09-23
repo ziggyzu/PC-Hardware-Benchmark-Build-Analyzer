@@ -1,29 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
 <BorderPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
+            fx:id="rootBorderPane"
             fx:controller="com.pcanalyzer.ui.MainController"
             prefHeight="760.0" prefWidth="1180.0">
 
-    <!-- Header Bar -->
+    <!-- Top Area: MenuBar & Brand Header -->
     <top>
         <VBox>
-            <HBox alignment="CENTER_LEFT" spacing="16.0" styleClass="header-bar">
+            <!-- Native JavaFX MenuBar -->
+            <MenuBar>
+                <menus>
+                    <Menu text="_File">
+                        <items>
+                            <MenuItem text="Refresh Catalog" onAction="#handleRefreshDatabase"/>
+                            <SeparatorMenuItem/>
+                            <MenuItem text="Exit" onAction="#handleExit"/>
+                        </items>
+                    </Menu>
+                    <Menu text="_Security">
+                        <items>
+                            <MenuItem text="Admin Authentication..." onAction="#handleAdminUnlockDialog"/>
+                        </items>
+                    </Menu>
+                    <Menu text="_View">
+                        <items>
+                            <MenuItem text="Hardware Catalog" onAction="#handleSwitchToCatalog"/>
+                            <MenuItem text="Build Configurator" onAction="#handleSwitchToBuild"/>
+                            <MenuItem text="Performance Comparisons" onAction="#handleSwitchToComparison"/>
+                        </items>
+                    </Menu>
+                    <Menu text="_Help">
+                        <items>
+                            <MenuItem text="About PC Analyzer" onAction="#handleAboutDialog"/>
+                        </items>
+                    </Menu>
+                </menus>
+            </MenuBar>
+
+            <!-- Brand Header -->
+            <HBox alignment="CENTER_LEFT" spacing="16.0" style="-fx-padding: 8px 16px; -fx-background-color: #f8fafc; -fx-border-color: #e2e8f0; -fx-border-width: 0 0 1px 0;">
                 <VBox spacing="2.0" HBox.hgrow="ALWAYS">
                     <Label text="PC Hardware Benchmark &amp; Build Analyzer" styleClass="app-title"/>
-                    <Label text="Real-time compatibility checking, benchmark comparisons, and pricing insights" styleClass="app-subtitle"/>
+                    <Label text="Real-time compatibility diagnostics, pricing tracker, and multi-tier benchmark analysis" styleClass="app-subtitle"/>
                 </VBox>
                 <HBox alignment="CENTER_RIGHT" spacing="12.0">
-                    <Label fx:id="connectionStatusLabel" text="● Database Connected" style="-fx-text-fill: #006400; -fx-font-weight: bold;"/>
+                    <Label fx:id="adminStatusLabel" text="[Guest Mode]" style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #64748b;"/>
+                    <Label fx:id="connectionStatusLabel" text="● SQLite Ready" style="-fx-text-fill: #16a34a; -fx-font-weight: bold;"/>
                 </HBox>
             </HBox>
         </VBox>
     </top>
 
-    <!-- Main Navigation Tabs -->
+    <!-- Center: Main Navigation Tabs -->
     <center>
         <TabPane fx:id="mainTabPane" tabClosingPolicy="UNAVAILABLE">
             <!-- Tab 1: Browse Hardware -->
@@ -45,10 +79,10 @@
 
     <!-- Bottom Status Bar -->
     <bottom>
-        <HBox alignment="CENTER_LEFT" spacing="16.0" styleClass="status-bar">
-            <Label fx:id="statusMessageLabel" text="System ready." styleClass="status-text" HBox.hgrow="ALWAYS"/>
+        <HBox alignment="CENTER_LEFT" spacing="16.0" style="-fx-padding: 6px 14px; -fx-background-color: #f1f5f9; -fx-border-color: #cbd5e1; -fx-border-width: 1px 0 0 0;">
+            <Label fx:id="statusMessageLabel" text="System ready." style="-fx-text-fill: #475569; -fx-font-size: 11px;" HBox.hgrow="ALWAYS"/>
             <Region HBox.hgrow="ALWAYS"/>
-            <Label fx:id="componentCountLabel" text="Components: 0" styleClass="status-text"/>
+            <Label fx:id="componentCountLabel" text="Catalog: 0 items" style="-fx-text-fill: #475569; -fx-font-size: 11px; -fx-font-weight: bold;"/>
         </HBox>
     </bottom>
 
