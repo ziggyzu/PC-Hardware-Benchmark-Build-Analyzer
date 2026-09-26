@@ -24,20 +24,13 @@ import java.io.IOException;
 import java.util.List;
 import java.util.function.Consumer;
 
-/**
- * Controller for the Hardware Catalog browse and search view.
- *
- * Demonstrates:
- * 1. Rich JavaFX UI Design: SplitPane, FlowPane, Slider, CheckBox, TableView, TitledPane, StackPane, ProgressBar, Tooltips.
- * 2. Dynamic Layout Responsiveness: TableColumn widths proportionally bound to TableView width via property constraints.
- * 3. High-Performance Filtering: FilteredList + SortedList reacting to search, sliders, and checkboxes.
- */
+// Controller for browsing, searching, and managing hardware parts in the catalog
 public class BrowseController {
 
-    // Main layout
+    // Main layout container
     @FXML private SplitPane browseSplitPane;
 
-    // Filters and Toolbar
+    // Search and filter controls
     @FXML private ComboBox<String> typeFilterComboBox;
     @FXML private TextField searchTextField;
     @FXML private Slider priceSlider;
@@ -45,7 +38,7 @@ public class BrowseController {
     @FXML private CheckBox lowTdpCheckBox;
     @FXML private FlowPane quickFilterFlowPane;
 
-    // Catalog Table
+    // Table view and its columns
     @FXML private TableView<Component> componentTableView;
     @FXML private TableColumn<Component, Number> idColumn;
     @FXML private TableColumn<Component, String> typeColumn;
@@ -55,12 +48,12 @@ public class BrowseController {
     @FXML private TableColumn<Component, Number> tdpColumn;
     @FXML private TableColumn<Component, String> specsColumn;
 
-    // Bottom Actions
+    // Action buttons at the bottom of the table
     @FXML private Button addToBuildButton;
     @FXML private Button deleteButton;
     @FXML private Label tableSummaryLabel;
 
-    // Inspector Panel
+    // Side panel showing details of the currently selected part
     @FXML private StackPane inspectorStackPane;
     @FXML private VBox inspectorPlaceholder;
     @FXML private VBox inspectorDetails;
@@ -74,15 +67,17 @@ public class BrowseController {
     @FXML private ProgressBar tdpProgressBar;
     @FXML private Button inspectorAddToBuildBtn;
 
+    // Internal data lists and database connection
     private ComponentDao componentDao;
     private final ObservableList<Component> masterData = FXCollections.observableArrayList();
     private FilteredList<Component> filteredData;
     private Consumer<Component> onAddToBuildCallback;
     private Consumer<String> onStatusMessageCallback;
 
+    // Set up table columns, listeners, and filters
     @FXML
     public void initialize() {
-        // 1. Configure Table Columns with Value Factories
+        // Read each field from a component object and place it into the matching column
         idColumn.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getId() != null ? cellData.getValue().getId() : 0));
         typeColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getType().getDisplayName()));
         brandColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getBrand()));
@@ -91,7 +86,7 @@ public class BrowseController {
         tdpColumn.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getTdpWatts()));
         specsColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getKeySpecs()));
 
-        // Format price column with currency
+        // Format the price column so it shows a dollar sign
         priceColumn.setCellFactory(tc -> new TableCell<>() {
             @Override
             protected void updateItem(Number price, boolean empty) {
@@ -104,7 +99,7 @@ public class BrowseController {
             }
         });
 
-        // 2. Dynamic Layout Responsiveness: Bind column widths proportionally to TableView width
+        // Automatically resize columns when the window expands or shrinks
         idColumn.prefWidthProperty().bind(componentTableView.widthProperty().multiply(0.06));
         typeColumn.prefWidthProperty().bind(componentTableView.widthProperty().multiply(0.12));
         brandColumn.prefWidthProperty().bind(componentTableView.widthProperty().multiply(0.12));
@@ -113,31 +108,31 @@ public class BrowseController {
         tdpColumn.prefWidthProperty().bind(componentTableView.widthProperty().multiply(0.08));
         specsColumn.prefWidthProperty().bind(componentTableView.widthProperty().multiply(0.26));
 
-        // 3. Initialize Filter ComboBox
+        // Fill the category dropdown with all component types
         typeFilterComboBox.getItems().add("All Categories");
         for (ComponentType type : ComponentType.values()) {
             typeFilterComboBox.getItems().add(type.getDisplayName());
         }
         typeFilterComboBox.getSelectionModel().selectFirst();
 
-        // 4. Live Property Binding for Slider Label
+        // Update the slider's price label in real time as the thumb moves
         priceSliderLabel.textProperty().bind(
                 Bindings.format("$%.0f", priceSlider.valueProperty())
         );
 
-        // 5. Setup FilteredList & Listeners
+        // Watch for changes in search text or filter controls
         filteredData = new FilteredList<>(masterData, p -> true);
         typeFilterComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> updatePredicate());
         searchTextField.textProperty().addListener((obs, oldVal, newVal) -> updatePredicate());
         priceSlider.valueProperty().addListener((obs, oldVal, newVal) -> updatePredicate());
         lowTdpCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> updatePredicate());
 
-        // 6. Wrap in SortedList for interactive column sorting
+        // Allow users to sort table columns by clicking their headers
         SortedList<Component> sortedData = new SortedList<>(filteredData);
         sortedData.comparatorProperty().bind(componentTableView.comparatorProperty());
         componentTableView.setItems(sortedData);
 
-        // 7. Selection Listeners for Table & Inspector Card
+        // Update action buttons and inspector when a row is clicked
         componentTableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
             boolean hasSelection = (newSel != null);
             addToBuildButton.setDisable(!hasSelection);
@@ -149,29 +144,61 @@ public class BrowseController {
         deleteButton.setDisable(true);
     }
 
+    // Connect the database DAO and start loading parts
     public void setComponentDao(ComponentDao componentDao) {
         this.componentDao = componentDao;
         loadComponentsFromDatabase();
     }
 
+    // Set callback to notify the parent window when a part is added to a build
     public void setOnAddToBuildCallback(Consumer<Component> callback) {
         this.onAddToBuildCallback = callback;
     }
 
+    // Set callback to post messages to the bottom status bar
     public void setOnStatusMessageCallback(Consumer<String> callback) {
         this.onStatusMessageCallback = callback;
     }
 
+    // Fetch all parts from SQLite in the background so the UI doesn't stutter
     public void loadComponentsFromDatabase() {
         if (componentDao == null) return;
-        List<Component> components = componentDao.findAll();
-        masterData.setAll(components);
-        updateSummaryLabel();
+
         if (onStatusMessageCallback != null) {
-            onStatusMessageCallback.accept("Loaded " + components.size() + " components from database.");
+            onStatusMessageCallback.accept("Querying database on background thread pool...");
         }
+
+        // Run the database query on a background worker thread
+        javafx.concurrent.Task<List<Component>> loadTask = new javafx.concurrent.Task<>() {
+            @Override
+            protected List<Component> call() {
+                return componentDao.findAll();
+            }
+        };
+
+        // When the query finishes, update the table on the screen
+        loadTask.setOnSucceeded(event -> {
+            List<Component> components = loadTask.getValue();
+            masterData.setAll(components);
+            updateSummaryLabel();
+            if (onStatusMessageCallback != null) {
+                onStatusMessageCallback.accept(String.format("Loaded %d components asynchronously from SQLite.", components.size()));
+            }
+        });
+
+        // Show an error if the query fails
+        loadTask.setOnFailed(event -> {
+            Throwable ex = loadTask.getException();
+            System.err.println("[BrowseController] Background loading failed: " + ex.getMessage());
+            if (onStatusMessageCallback != null) {
+                onStatusMessageCallback.accept("Error loading components: " + ex.getMessage());
+            }
+        });
+
+        com.pcanalyzer.util.ThreadPoolManager.getInstance().submitTask(loadTask);
     }
 
+    // Filter parts according to search text, selected category, max price, and TDP
     private void updatePredicate() {
         String selectedCategory = typeFilterComboBox.getValue();
         String searchFilter = searchTextField.getText() != null ? searchTextField.getText().trim().toLowerCase() : "";
@@ -179,24 +206,24 @@ public class BrowseController {
         boolean lowTdpOnly = lowTdpCheckBox.isSelected();
 
         filteredData.setPredicate(comp -> {
-            // Category check
+            // Check if the part matches the selected category
             if (selectedCategory != null && !selectedCategory.equals("All Categories")) {
                 if (!comp.getType().getDisplayName().equalsIgnoreCase(selectedCategory)) {
                     return false;
                 }
             }
 
-            // Price filter check
+            // Exclude parts that cost more than the price slider
             if (comp.getPrice() > maxPrice) {
                 return false;
             }
 
-            // Low TDP check (< 100W)
+            // Exclude power-hungry parts if the low power checkbox is on
             if (lowTdpOnly && comp.getTdpWatts() >= 100) {
                 return false;
             }
 
-            // Search keyword check
+            // Check if the part name, brand, or specs match what the user typed
             if (!searchFilter.isEmpty()) {
                 boolean matchesBrand = comp.getBrand().toLowerCase().contains(searchFilter);
                 boolean matchesName = comp.getName().toLowerCase().contains(searchFilter);
@@ -210,11 +237,14 @@ public class BrowseController {
         updateSummaryLabel();
     }
 
+    // Update the right-side inspector panel with details of the selected part
     private void updateInspector(Component comp) {
         if (comp == null) {
+            // Show placeholder if nothing is selected
             inspectorPlaceholder.setVisible(true);
             inspectorDetails.setVisible(false);
         } else {
+            // Populate all fields with the selected part's specs
             inspectorPlaceholder.setVisible(false);
             inspectorDetails.setVisible(true);
 
@@ -225,18 +255,19 @@ public class BrowseController {
             detailTdpLabel.setText(comp.getTdpWatts() + " W");
             detailSpecsLabel.setText(comp.getKeySpecs());
 
-            // Relative TDP power draw progress (compared against high-end 350W target)
+            // Show power draw percentage relative to 350W
             double tdpRatio = Math.min(1.0, (double) comp.getTdpWatts() / 350.0);
             tdpProgressBar.setProgress(tdpRatio);
             detailTdpPercentLabel.setText(String.format("%.0f%%", tdpRatio * 100));
         }
     }
 
+    // Update the label showing how many parts match the current filters
     private void updateSummaryLabel() {
         tableSummaryLabel.setText(String.format("Showing %d of %d components", filteredData.size(), masterData.size()));
     }
 
-    // Quick tag handlers
+    // Quick filter tag button handlers
     @FXML private void handleQuickFilterAll() { typeFilterComboBox.getSelectionModel().select(0); }
     @FXML private void handleQuickFilterCpu() { selectCategory(ComponentType.CPU.getDisplayName()); }
     @FXML private void handleQuickFilterGpu() { selectCategory(ComponentType.GPU.getDisplayName()); }
@@ -244,10 +275,12 @@ public class BrowseController {
     @FXML private void handleQuickFilterRam() { selectCategory(ComponentType.RAM.getDisplayName()); }
     @FXML private void handleQuickFilterPsu() { selectCategory(ComponentType.PSU.getDisplayName()); }
 
+    // Helper to select a category by its name
     private void selectCategory(String displayName) {
         typeFilterComboBox.getSelectionModel().select(displayName);
     }
 
+    // Reset all search boxes, sliders, and checkboxes back to default
     @FXML
     private void handleResetFilters() {
         typeFilterComboBox.getSelectionModel().selectFirst();
@@ -256,11 +289,13 @@ public class BrowseController {
         lowTdpCheckBox.setSelected(false);
     }
 
+    // Reload all parts from the database
     @FXML
     private void handleRefresh() {
         loadComponentsFromDatabase();
     }
 
+    // Add the currently highlighted part to the active PC build
     @FXML
     private void handleAddToBuild() {
         Component selected = componentTableView.getSelectionModel().getSelectedItem();
@@ -272,11 +307,13 @@ public class BrowseController {
         }
     }
 
+    // Delete the selected part after asking the user to confirm
     @FXML
     private void handleDeleteComponent() {
         Component selected = componentTableView.getSelectionModel().getSelectedItem();
         if (selected == null || componentDao == null) return;
 
+        // Ask for confirmation before deleting
         Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
         confirmAlert.setTitle("Confirm Deletion");
         confirmAlert.setHeaderText("Delete " + selected.getBrand() + " " + selected.getName() + "?");
@@ -300,6 +337,7 @@ public class BrowseController {
         });
     }
 
+    // Open a popup dialog to let the user add a new hardware part
     @FXML
     private void handleAddComponent() {
         try {
@@ -319,6 +357,7 @@ public class BrowseController {
 
             dialogStage.showAndWait();
 
+            // Refresh the table if a new part was saved
             if (controller.isComponentAdded()) {
                 loadComponentsFromDatabase();
                 if (onStatusMessageCallback != null) {

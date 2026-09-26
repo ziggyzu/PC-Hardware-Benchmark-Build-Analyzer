@@ -5,26 +5,12 @@ import com.pcanalyzer.model.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Service that evaluates hardware compatibility rules for a PC build.
- *
- * Design Decision:
- * 1. Decoupled Business Logic: Compatibility checks are pure algorithmic calculations,
- *    isolated from UI views and databases. This makes it trivial to unit-test and extend
- *    with new rules without breaking controllers.
- * 2. Structured Diagnostics: Rather than aborting at the first failure or returning
- *    a simple boolean, this service evaluates all rules and collects detailed diagnostics
- *    with severity ratings (INCOMPATIBLE, WARNING).
- */
+// Checks whether components in a build will physically and electrically work together
 public class CompatibilityChecker {
 
-    /**
-     * Evaluates all compatibility rules for the given build configuration.
-     *
-     * @param build Build containing selected components
-     * @return CompatibilityResult containing status and itemized diagnostic messages
-     */
+    // Run all checks on the build and collect any warnings or errors
     public CompatibilityResult checkCompatibility(Build build) {
+        // If there is no build, treat it as compatible by default
         if (build == null) {
             return CompatibilityResult.compatible();
         }
@@ -32,7 +18,7 @@ public class CompatibilityChecker {
         List<CompatibilityIssue> issues = new ArrayList<>();
         CompatibilityStatus worstStatus = CompatibilityStatus.COMPATIBLE;
 
-        // Rule 1: CPU Socket vs Motherboard Socket
+        // Check if CPU socket matches the motherboard socket
         if (build.getCpu() != null && build.getMotherboard() != null) {
             String cpuSocket = build.getCpu().getSocket().trim();
             String moboSocket = build.getMotherboard().getSocket().trim();
@@ -47,7 +33,7 @@ public class CompatibilityChecker {
             }
         }
 
-        // Rule 2: RAM Generation vs Motherboard RAM Support
+        // Check if RAM type matches the motherboard memory standard
         if (build.getRam() != null && build.getMotherboard() != null) {
             String ramType = build.getRam().getRamType().trim();
             String moboRam = build.getMotherboard().getRamType().trim();
@@ -62,12 +48,13 @@ public class CompatibilityChecker {
             }
         }
 
-        // Rule 3: Power Supply Capacity and Headroom Margin (~20%)
+        // Check if the power supply has enough wattage for CPU and GPU load
         if (build.getPsu() != null && (build.getCpu() != null || build.getGpu() != null)) {
             int psuWattage = build.getPsu().getWattage();
             int peakDraw = build.getEstimatedPeakPowerWatts();
             int recommendedWatts = build.getRecommendedPsuWatts();
 
+            // Check if wattage falls below estimated peak system load
             if (psuWattage < peakDraw) {
                 issues.add(new CompatibilityIssue(
                         "Insufficient PSU Wattage",
@@ -77,6 +64,7 @@ public class CompatibilityChecker {
                 ));
                 worstStatus = CompatibilityStatus.INCOMPATIBLE;
             } else if (psuWattage < recommendedWatts) {
+                // Warn the user if headroom is tighter than 20%
                 issues.add(new CompatibilityIssue(
                         "Tight Power Headroom",
                         String.format("PSU capacity (%dW) covers estimated load (%dW) but leaves less than 20%% safety headroom (recommended: %dW). Transient spikes may trigger OCP.",
@@ -88,7 +76,7 @@ public class CompatibilityChecker {
                 }
             }
 
-            // Rule 3b: GPU specific vendor recommendation
+            // Check if power supply meets GPU manufacturer recommended wattage
             if (build.getGpu() != null && build.getGpu().getRecommendedPsuWatts() > 0) {
                 int gpuRecommended = build.getGpu().getRecommendedPsuWatts();
                 if (psuWattage < gpuRecommended && worstStatus != CompatibilityStatus.INCOMPATIBLE) {
@@ -105,6 +93,7 @@ public class CompatibilityChecker {
             }
         }
 
+        // Return the final result with worst status and all collected issues
         return new CompatibilityResult(worstStatus, issues);
     }
 }

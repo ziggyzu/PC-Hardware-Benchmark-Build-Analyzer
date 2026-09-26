@@ -2,17 +2,10 @@ package com.pcanalyzer.model;
 
 import java.util.Objects;
 
-/**
- * Represents a Central Processing Unit (CPU).
- *
- * Design Decision:
- * The CPU model captures hardware attributes necessary for:
- * 1. Physical compatibility checking (motherboard socket match).
- * 2. Benchmark ranking (multithreaded synthetic benchmark score).
- * 3. Power budget calculation (TDP inherited from Component).
- */
+// Processor (CPU) details and benchmark scores
 public class Cpu extends Component {
 
+    // Extra CPU specifications like socket, cores, and clock speed
     private String socket;
     private int cores;
     private int threads;
@@ -20,6 +13,7 @@ public class Cpu extends Component {
     private double boostClockGhz;
     private int benchmarkScore;
 
+    // Create a new CPU with its specs and scores
     public Cpu(Integer id, String brand, String name, double price, int tdpWatts,
                String socket, int cores, int threads, double baseClockGhz, double boostClockGhz, int benchmarkScore) {
         super(id, ComponentType.CPU, brand, name, price, tdpWatts);
@@ -31,6 +25,7 @@ public class Cpu extends Component {
         this.benchmarkScore = Math.max(0, benchmarkScore);
     }
 
+    // Getters and setters for CPU specs
     public String getSocket() {
         return socket;
     }
@@ -79,6 +74,7 @@ public class Cpu extends Component {
         this.benchmarkScore = Math.max(0, benchmarkScore);
     }
 
+    // Format the socket, core count, clocks, and score into a one-liner
     @Override
     public String getKeySpecs() {
         return String.format("%s | %dC/%dT | %.1f-%.1f GHz | Score: %,d",

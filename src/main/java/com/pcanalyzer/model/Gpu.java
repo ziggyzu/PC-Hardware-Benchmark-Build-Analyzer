@@ -1,17 +1,9 @@
 package com.pcanalyzer.model;
 
-/**
- * Represents a Graphics Processing Unit (GPU / Video Card).
- *
- * Design Decision:
- * Stores average gaming framerates across common resolutions (1080p, 1440p, 4K)
- * and power requirements (board power and recommended PSU).
- * This enables:
- * 1. Power headroom checking against the selected PSU.
- * 2. Resolution-based benchmark charts and price-to-performance metrics ($/FPS).
- */
+// Graphics card (GPU) details and gaming framerate performance
 public class Gpu extends Component {
 
+    // Extra GPU specs like video memory, wattage, and average FPS
     private int vramGb;
     private int boardPowerWatts;
     private int recommendedPsuWatts;
@@ -19,6 +11,7 @@ public class Gpu extends Component {
     private double fps1440p;
     private double fps4k;
 
+    // Create a new GPU with its specs and gaming benchmark numbers
     public Gpu(Integer id, String brand, String name, double price, int tdpWatts,
                int vramGb, int boardPowerWatts, int recommendedPsuWatts,
                double fps1080p, double fps1440p, double fps4k) {
@@ -31,6 +24,7 @@ public class Gpu extends Component {
         this.fps4k = Math.max(0.0, fps4k);
     }
 
+    // Getters and setters for GPU specs
     public int getVramGb() {
         return vramGb;
     }
@@ -79,12 +73,7 @@ public class Gpu extends Component {
         this.fps4k = Math.max(0.0, fps4k);
     }
 
-    /**
-     * Retrieve average FPS for a specified resolution string.
-     *
-     * @param resolution "1080p", "1440p", or "4K"
-     * @return Average frames per second
-     */
+    // Look up the framerate for a given screen resolution
     public double getFpsForResolution(String resolution) {
         if (resolution == null) return 0.0;
         return switch (resolution.trim().toUpperCase()) {
@@ -95,6 +84,7 @@ public class Gpu extends Component {
         };
     }
 
+    // Format the VRAM, power, and FPS stats into a clean summary
     @Override
     public String getKeySpecs() {
         return String.format("%dGB VRAM | %dW Board | FPS: %.0f (1080p) / %.0f (1440p) / %.0f (4K)",

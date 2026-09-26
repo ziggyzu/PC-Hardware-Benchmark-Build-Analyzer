@@ -8,17 +8,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * SQLite implementation of PriceHistoryDao using PreparedStatements.
- */
+// Saves and reads price history using SQLite database tables
 public class SqlitePriceHistoryDao implements PriceHistoryDao {
 
     private final DatabaseManager dbManager;
 
+    // Attach our database connection manager
     public SqlitePriceHistoryDao(DatabaseManager dbManager) {
         this.dbManager = Objects.requireNonNull(dbManager, "DatabaseManager cannot be null");
     }
 
+    // Insert a new price log entry into SQLite
     @Override
     public void recordPrice(int componentId, double price, String source) {
         String sql = "INSERT INTO price_history (component_id, price, source) VALUES (?, ?, ?)";
@@ -33,6 +33,7 @@ public class SqlitePriceHistoryDao implements PriceHistoryDao {
         }
     }
 
+    // Read all recorded prices for a specific part ordered by date
     @Override
     public List<PriceRecord> getHistoryForComponent(int componentId) {
         String sql = "SELECT id, component_id, price, source, fetched_at FROM price_history WHERE component_id = ? ORDER BY fetched_at ASC";

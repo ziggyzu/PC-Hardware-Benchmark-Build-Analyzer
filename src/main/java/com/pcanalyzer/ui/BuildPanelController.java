@@ -7,20 +7,13 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
-/**
- * Controller for the Build Configurator panel.
- *
- * Demonstrates:
- * 1. Rich JavaFX UI Design: SplitPane, Accordion, TitledPane, ProgressBar, Slider, CheckBox, ListView, Badges.
- * 2. Dynamic Layout Responsiveness: SplitPane divider constraints, reactive power and budget utilization meters.
- * 3. Reactive Feedback: Real-time recalculation of costs, power metrics, and compatibility diagnostics.
- */
+// Controls the build planner where users assemble and check their PC parts
 public class BuildPanelController {
 
-    // Main layout
+    // Main split layout
     @FXML private SplitPane buildSplitPane;
 
-    // Component Accordion & TitledPanes
+    // Expandable cards for each hardware slot
     @FXML private Accordion componentsAccordion;
     @FXML private TitledPane cpuTitledPane;
     @FXML private TitledPane moboTitledPane;
@@ -28,35 +21,39 @@ public class BuildPanelController {
     @FXML private TitledPane gpuTitledPane;
     @FXML private TitledPane psuTitledPane;
 
-    // Slot Labels
+    // Processor slot labels
     @FXML private Label cpuNameLabel;
     @FXML private Label cpuSpecsLabel;
     @FXML private Label cpuPriceLabel;
 
+    // Motherboard slot labels
     @FXML private Label moboNameLabel;
     @FXML private Label moboSpecsLabel;
     @FXML private Label moboPriceLabel;
 
+    // Memory slot labels
     @FXML private Label ramNameLabel;
     @FXML private Label ramSpecsLabel;
     @FXML private Label ramPriceLabel;
 
+    // Graphics card slot labels
     @FXML private Label gpuNameLabel;
     @FXML private Label gpuSpecsLabel;
     @FXML private Label gpuPriceLabel;
 
+    // Power supply slot labels
     @FXML private Label psuNameLabel;
     @FXML private Label psuSpecsLabel;
     @FXML private Label psuPriceLabel;
 
-    // Financial & Budget Tracker Controls
+    // Budget tracker labels and slider
     @FXML private Label totalPriceLabel;
     @FXML private Label budgetValueLabel;
     @FXML private Label budgetPercentLabel;
     @FXML private ProgressBar budgetProgressBar;
     @FXML private Slider budgetSlider;
 
-    // Power Draw Controls
+    // Power consumption labels and meters
     @FXML private Label totalTdpLabel;
     @FXML private Label estimatedPeakLabel;
     @FXML private Label recommendedPsuLabel;
@@ -64,16 +61,18 @@ public class BuildPanelController {
     @FXML private ProgressBar psuLoadProgressBar;
     @FXML private CheckBox overclockHeadroomCheckBox;
 
-    // Diagnostics
+    // Compatibility badge and warnings list
     @FXML private Label compatibilityBadge;
     @FXML private ListView<CompatibilityIssue> diagnosticListView;
 
+    // Current PC build and checker tool
     private final Build currentBuild = new Build("Active System Build");
     private final CompatibilityChecker compatibilityChecker = new CompatibilityChecker();
 
+    // Set up the build screen and attach listeners
     @FXML
     public void initialize() {
-        // 1. Custom cell renderer for compatibility diagnostics
+        // Color-code warnings red or yellow in the issues list
         diagnosticListView.setCellFactory(lv -> new ListCell<>() {
             @Override
             protected void updateItem(CompatibilityIssue issue, boolean empty) {
@@ -92,78 +91,84 @@ public class BuildPanelController {
             }
         });
 
-        // 2. Budget slider live binding
+        // Show the budget slider amount in real time
         budgetValueLabel.textProperty().bind(
                 Bindings.format("$%.0f", budgetSlider.valueProperty())
         );
+
+        // Recalculate metrics when the budget or overclock settings change
         budgetSlider.valueProperty().addListener((obs, oldVal, newVal) -> updateBudgetMetrics());
         overclockHeadroomCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> updatePowerMetrics());
 
+        // Refresh all labels with default values
         refreshBuildView();
     }
 
-    /**
-     * Add a component to the active build and refresh view.
-     */
+    // Add a chosen part into the current build
     public void addComponentToBuild(Component component) {
         if (component == null) return;
         currentBuild.setComponent(component);
         refreshBuildView();
     }
 
+    // Grab the current PC build
     public Build getCurrentBuild() {
         return currentBuild;
     }
 
+    // Take the processor out of the build
     @FXML
     private void handleRemoveCpu() {
         currentBuild.setCpu(null);
         refreshBuildView();
     }
 
+    // Take the motherboard out of the build
     @FXML
     private void handleRemoveMotherboard() {
         currentBuild.setMotherboard(null);
         refreshBuildView();
     }
 
+    // Take the memory out of the build
     @FXML
     private void handleRemoveRam() {
         currentBuild.setRam(null);
         refreshBuildView();
     }
 
+    // Take the graphics card out of the build
     @FXML
     private void handleRemoveGpu() {
         currentBuild.setGpu(null);
         refreshBuildView();
     }
 
+    // Take the power supply out of the build
     @FXML
     private void handleRemovePsu() {
         currentBuild.setPsu(null);
         refreshBuildView();
     }
 
+    // Remove all parts from the current build
     @FXML
     private void handleClearBuild() {
         currentBuild.clear();
         refreshBuildView();
     }
 
+    // Open the first part card in the list
     @FXML
     private void handleExpandAll() {
-        // Expand the currently selected or first pane
         if (componentsAccordion != null && !componentsAccordion.getPanes().isEmpty()) {
             componentsAccordion.setExpandedPane(componentsAccordion.getPanes().get(0));
         }
     }
 
-    /**
-     * Synchronizes UI controls with current Build state and evaluates compatibility.
-     */
+    // Update all text labels, meters, and compatibility warnings
     public void refreshBuildView() {
-        // CPU Slot
+        // Update the CPU card
         Cpu cpu = currentBuild.getCpu();
         if (cpu != null) {
             cpuTitledPane.setText("Processor (CPU) — " + cpu.getBrand() + " " + cpu.getName());
@@ -177,7 +182,7 @@ public class BuildPanelController {
             cpuPriceLabel.setText("$0.00");
         }
 
-        // Motherboard Slot
+        // Update the Motherboard card
         Motherboard mobo = currentBuild.getMotherboard();
         if (mobo != null) {
             moboTitledPane.setText("Motherboard — " + mobo.getBrand() + " " + mobo.getName());
@@ -191,7 +196,7 @@ public class BuildPanelController {
             moboPriceLabel.setText("$0.00");
         }
 
-        // RAM Slot
+        // Update the RAM card
         Ram ram = currentBuild.getRam();
         if (ram != null) {
             ramTitledPane.setText("Memory (RAM) — " + ram.getBrand() + " " + ram.getName());
@@ -205,7 +210,7 @@ public class BuildPanelController {
             ramPriceLabel.setText("$0.00");
         }
 
-        // GPU Slot
+        // Update the GPU card
         Gpu gpu = currentBuild.getGpu();
         if (gpu != null) {
             gpuTitledPane.setText("Graphics Card (GPU) — " + gpu.getBrand() + " " + gpu.getName());
@@ -219,7 +224,7 @@ public class BuildPanelController {
             gpuPriceLabel.setText("$0.00");
         }
 
-        // PSU Slot
+        // Update the Power Supply card
         Psu psu = currentBuild.getPsu();
         if (psu != null) {
             psuTitledPane.setText("Power Supply (PSU) — " + psu.getBrand() + " " + psu.getName());
@@ -233,15 +238,16 @@ public class BuildPanelController {
             psuPriceLabel.setText("$0.00");
         }
 
-        // Update financial and power progress indicators
+        // Recalculate price and power numbers
         updateBudgetMetrics();
         updatePowerMetrics();
 
-        // Compatibility Evaluation
+        // Check if any parts conflict with each other
         CompatibilityResult result = compatibilityChecker.checkCompatibility(currentBuild);
         updateCompatibilityDisplay(result);
     }
 
+    // Calculate how much money we spent and update the progress bar
     private void updateBudgetMetrics() {
         double totalPrice = currentBuild.getTotalPrice();
         totalPriceLabel.setText(String.format("$%.2f", totalPrice));
@@ -249,9 +255,12 @@ public class BuildPanelController {
         double budgetLimit = (budgetSlider != null) ? budgetSlider.getValue() : 1500.0;
         double budgetRatio = budgetLimit > 0 ? (totalPrice / budgetLimit) : 0.0;
 
+        // Fill up the progress bar
         if (budgetProgressBar != null) {
             budgetProgressBar.setProgress(Math.min(1.0, budgetRatio));
         }
+
+        // Turn the text red if we went over budget
         if (budgetPercentLabel != null) {
             budgetPercentLabel.setText(String.format("%.0f%% of budget", budgetRatio * 100));
             if (budgetRatio > 1.0) {
@@ -262,10 +271,12 @@ public class BuildPanelController {
         }
     }
 
+    // Add up total wattage and check if our power supply has enough juice
     private void updatePowerMetrics() {
         int baseTdp = currentBuild.getTotalTdpWatts();
         int peakWatts = currentBuild.getEstimatedPeakPowerWatts();
 
+        // Add extra buffer if overclocking is turned on
         boolean extraOverclock = (overclockHeadroomCheckBox != null && overclockHeadroomCheckBox.isSelected());
         int recWatts = currentBuild.getRecommendedPsuWatts();
         if (extraOverclock) {
@@ -276,7 +287,7 @@ public class BuildPanelController {
         estimatedPeakLabel.setText(peakWatts + " W");
         recommendedPsuLabel.setText(recWatts + " W" + (extraOverclock ? " (+35% OC Headroom)" : " (+20% Headroom)"));
 
-        // Update PSU utilization meter
+        // Show how close we are to maxing out our power supply
         Psu psu = currentBuild.getPsu();
         if (psu != null && psu.getWattage() > 0) {
             double loadRatio = (double) peakWatts / psu.getWattage();
@@ -297,6 +308,7 @@ public class BuildPanelController {
         }
     }
 
+    // Show whether the current build works or has problems
     private void updateCompatibilityDisplay(CompatibilityResult result) {
         diagnosticListView.setItems(FXCollections.observableArrayList(result.getIssues()));
 

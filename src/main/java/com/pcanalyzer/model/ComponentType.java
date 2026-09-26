@@ -1,12 +1,6 @@
 package com.pcanalyzer.model;
 
-/**
- * Enumeration of supported PC hardware component categories.
- * 
- * Design Decision:
- * An enum provides type safety across the application, preventing invalid
- * category strings in the database, UI filters, and compatibility checks.
- */
+// List of all component categories we support in the application
 public enum ComponentType {
     CPU("CPU (Processor)"),
     GPU("GPU (Graphics Card)"),
@@ -14,12 +8,15 @@ public enum ComponentType {
     RAM("RAM (Memory)"),
     PSU("Power Supply (PSU)");
 
+    // Human readable name for the UI
     private final String displayName;
 
+    // Attach display name to each category
     ComponentType(String displayName) {
         this.displayName = displayName;
     }
 
+    // Get the display name for UI dropdowns and labels
     public String getDisplayName() {
         return displayName;
     }
@@ -29,12 +26,7 @@ public enum ComponentType {
         return displayName;
     }
 
-    /**
-     * Safely parse a string into a ComponentType, case-insensitively.
-     *
-     * @param value String representation of the type
-     * @return Matching ComponentType or null if not found
-     */
+    // Match a string from user input or database back to the enum category
     public static ComponentType fromString(String value) {
         if (value == null) {
             return null;

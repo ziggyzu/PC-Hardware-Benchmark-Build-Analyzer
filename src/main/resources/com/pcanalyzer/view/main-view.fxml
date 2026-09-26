@@ -23,6 +23,11 @@
                             <MenuItem text="Exit" onAction="#handleExit"/>
                         </items>
                     </Menu>
+                    <Menu text="_Tools">
+                        <items>
+                            <MenuItem text="⚡ Sync Live Market Data (Async HTTP/JSON)" onAction="#handleSyncMarketData"/>
+                        </items>
+                    </Menu>
                     <Menu text="_Security">
                         <items>
                             <MenuItem text="Admin Authentication..." onAction="#handleAdminUnlockDialog"/>
@@ -50,6 +55,9 @@
                     <Label text="Real-time compatibility diagnostics, pricing tracker, and multi-tier benchmark analysis" styleClass="app-subtitle"/>
                 </VBox>
                 <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                    <Button text="⚡ Sync Live Data" onAction="#handleSyncMarketData" styleClass="btn-primary" style="-fx-font-size: 11px;">
+                        <tooltip><Tooltip text="Fetch and parse market data asynchronously on background thread pool"/></tooltip>
+                    </Button>
                     <Label fx:id="adminStatusLabel" text="[Guest Mode]" style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #64748b;"/>
                     <Label fx:id="connectionStatusLabel" text="● SQLite Ready" style="-fx-text-fill: #16a34a; -fx-font-weight: bold;"/>
                 </HBox>
@@ -82,6 +90,8 @@
         <HBox alignment="CENTER_LEFT" spacing="16.0" style="-fx-padding: 6px 14px; -fx-background-color: #f1f5f9; -fx-border-color: #cbd5e1; -fx-border-width: 1px 0 0 0;">
             <Label fx:id="statusMessageLabel" text="System ready." style="-fx-text-fill: #475569; -fx-font-size: 11px;" HBox.hgrow="ALWAYS"/>
             <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="threadPoolStatusLabel" text="⚡ ThreadPool: 4 Workers Ready" style="-fx-text-fill: #2563eb; -fx-font-size: 11px; -fx-font-weight: bold;"/>
+            <Separator orientation="VERTICAL"/>
             <Label fx:id="componentCountLabel" text="Catalog: 0 items" style="-fx-text-fill: #475569; -fx-font-size: 11px; -fx-font-weight: bold;"/>
         </HBox>
     </bottom>

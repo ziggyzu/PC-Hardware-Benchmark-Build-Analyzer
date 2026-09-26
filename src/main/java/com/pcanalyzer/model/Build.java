@@ -5,19 +5,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Represents a complete or in-progress PC build configuration.
- *
- * Design Decision:
- * 1. Slot-Based Aggregation: Standard PC builds consist of dedicated slots
- *    (CPU, GPU, Motherboard, RAM, PSU). Modeling these as distinct typed slots
- *    guarantees type safety while allowing an optional list of extra components
- *    (such as additional storage or cooling).
- * 2. Domain Calculations: Encapsulates total price, TDP, and estimated power
- *    within the domain entity so that business rules stay cohesive and testable.
- */
+// Holds a full PC build with its selected parts and calculations
 public class Build {
 
+    // Store the build name and the parts chosen for each slot
     private Integer id;
     private String name;
     private Cpu cpu;
@@ -27,17 +18,20 @@ public class Build {
     private Psu psu;
     private final List<Component> extraComponents = new ArrayList<>();
 
-    // Fixed overhead in watts for motherboard chipset, RAM sticks, storage drives, and cooling fans
+    // Estimated baseline power used by motherboard, fans, and storage
     public static final int BASE_SYSTEM_OVERHEAD_WATTS = 70;
 
+    // Start with a default build name
     public Build() {
         this("Custom Build");
     }
 
+    // Start a build with a custom name
     public Build(String name) {
         this.name = Objects.requireNonNullElse(name, "Custom Build");
     }
 
+    // Getters and setters for the build ID and name
     public Integer getId() {
         return id;
     }
@@ -54,6 +48,7 @@ public class Build {
         this.name = name;
     }
 
+    // Getters and setters for each hardware component slot
     public Cpu getCpu() {
         return cpu;
     }
@@ -94,6 +89,7 @@ public class Build {
         this.psu = psu;
     }
 
+    // Manage any extra components added to the build
     public List<Component> getExtraComponents() {
         return Collections.unmodifiableList(extraComponents);
     }
@@ -108,11 +104,7 @@ public class Build {
         extraComponents.remove(component);
     }
 
-    /**
-     * Polymorphically assign a component to its corresponding slot based on its type.
-     *
-     * @param component The component to install
-     */
+    // Put a component into its matching slot automatically based on what it is
     public void setComponent(Component component) {
         if (component == null) return;
         switch (component.getType()) {
@@ -124,11 +116,7 @@ public class Build {
         }
     }
 
-    /**
-     * Remove component from its slot if it matches.
-     *
-     * @param component Component to remove
-     */
+    // Remove this specific component from whichever slot it is currently occupying
     public void removeComponent(Component component) {
         if (component == null) return;
         if (Objects.equals(cpu, component)) cpu = null;
@@ -139,9 +127,7 @@ public class Build {
         else extraComponents.remove(component);
     }
 
-    /**
-     * Clear all components from the build.
-     */
+    // Empty out all parts from the build
     public void clear() {
         cpu = null;
         gpu = null;
@@ -151,11 +137,7 @@ public class Build {
         extraComponents.clear();
     }
 
-    /**
-     * Returns a list of all currently assigned components.
-     *
-     * @return List of non-null components in this build
-     */
+    // Collect all chosen parts into a single list
     public List<Component> getAllComponents() {
         List<Component> list = new ArrayList<>();
         if (cpu != null) list.add(cpu);
@@ -167,44 +149,26 @@ public class Build {
         return list;
     }
 
-    /**
-     * Calculates the total cost of all components in this build.
-     *
-     * @return Sum of component prices in USD
-     */
+    // Calculate the total price of all parts in this build
     public double getTotalPrice() {
         return getAllComponents().stream()
                 .mapToDouble(Component::getPrice)
                 .sum();
     }
 
-    /**
-     * Calculates raw TDP sum of the CPU and GPU.
-     *
-     * @return Total TDP in Watts
-     */
+    // Add up the wattage for the CPU and GPU combined
     public int getTotalTdpWatts() {
         int cpuWatts = cpu != null ? cpu.getTdpWatts() : 0;
         int gpuWatts = gpu != null ? Math.max(gpu.getTdpWatts(), gpu.getBoardPowerWatts()) : 0;
         return cpuWatts + gpuWatts;
     }
 
-    /**
-     * Calculates the estimated peak power draw under full system load,
-     * adding baseline motherboard/RAM/cooling overhead.
-     *
-     * @return Estimated power consumption in Watts
-     */
+    // Calculate maximum expected power usage including system baseline
     public int getEstimatedPeakPowerWatts() {
         return getTotalTdpWatts() + BASE_SYSTEM_OVERHEAD_WATTS;
     }
 
-    /**
-     * Calculates the recommended PSU wattage providing ~20% safety headroom
-     * to prevent shutdowns during transient power spikes.
-     *
-     * @return Recommended minimum PSU wattage
-     */
+    // Recommend a power supply wattage with a 20% safety buffer
     public int getRecommendedPsuWatts() {
         return (int) Math.ceil(getEstimatedPeakPowerWatts() * 1.20);
     }

@@ -7,42 +7,28 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-/**
- * Manages SQLite database connections, idempotent schema creation, and seeding.
- *
- * Design Decision:
- * 1. Plain JDBC with PreparedStatements: No heavy ORM (like Hibernate) which would add
- *    unnecessary overhead, complex configuration, and slow startup time to a desktop app.
- * 2. Configurable Connection URL: Allows runtime configuration of file-based storage
- *    (e.g., `jdbc:sqlite:pcanalyzer.db`) or in-memory storage (`jdbc:sqlite::memory:`)
- *    for lightning-fast isolated unit tests.
- * 3. Idempotent Migrations: `CREATE TABLE IF NOT EXISTS` ensures the application starts
- *    smoothly whether on a fresh install or existing database.
- * 4. Foreign Keys: SQLite requires explicit `PRAGMA foreign_keys = ON;` per connection.
- */
+// Manages the SQLite database connection, table setup, and starter sample data
 public class DatabaseManager {
 
     private static final String DEFAULT_DB_URL = "jdbc:sqlite:pcanalyzer.db";
     private final String dbUrl;
 
+    // Use default database file
     public DatabaseManager() {
         this(DEFAULT_DB_URL);
     }
 
+    // Allow custom database path (useful for unit tests)
     public DatabaseManager(String dbUrl) {
         this.dbUrl = (dbUrl != null && !dbUrl.isBlank()) ? dbUrl : DEFAULT_DB_URL;
     }
 
+    // Get the active database connection URL
     public String getDbUrl() {
         return dbUrl;
     }
 
-    /**
-     * Obtains a new database connection with foreign key enforcement enabled.
-     *
-     * @return Open Connection to SQLite database
-     * @throws SQLException If connection fails
-     */
+    // Connect to SQLite and enable foreign key enforcement
     public Connection getConnection() throws SQLException {
         Connection conn = DriverManager.getConnection(dbUrl);
         try (Statement stmt = conn.createStatement()) {
@@ -51,9 +37,7 @@ public class DatabaseManager {
         return conn;
     }
 
-    /**
-     * Initializes database schema idempotently and seeds starter components if empty.
-     */
+    // Create the database tables and insert sample parts if empty
     public void initialize() {
         try (Connection conn = getConnection()) {
             createSchema(conn);
@@ -64,9 +48,10 @@ public class DatabaseManager {
         }
     }
 
+    // Create all 9 database tables and search indexes
     private void createSchema(Connection conn) throws SQLException {
         try (Statement stmt = conn.createStatement()) {
-            // 1. Base Components Table
+            // Main table for all hardware components
             stmt.execute("""
                 CREATE TABLE IF NOT EXISTS components (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -78,7 +63,7 @@ public class DatabaseManager {
                 );
             """);
 
-            // 2. CPU Specs Table
+            // Processor specifications table
             stmt.execute("""
                 CREATE TABLE IF NOT EXISTS cpu_specs (
                     component_id INTEGER PRIMARY KEY,
@@ -92,7 +77,7 @@ public class DatabaseManager {
                 );
             """);
 
-            // 3. GPU Specs Table
+            // Graphics card specifications table
             stmt.execute("""
                 CREATE TABLE IF NOT EXISTS gpu_specs (
                     component_id INTEGER PRIMARY KEY,
@@ -106,7 +91,7 @@ public class DatabaseManager {
                 );
             """);
 
-            // 4. Motherboard Specs Table
+            // Motherboard specifications table
             stmt.execute("""
                 CREATE TABLE IF NOT EXISTS motherboard_specs (
                     component_id INTEGER PRIMARY KEY,
@@ -116,7 +101,7 @@ public class DatabaseManager {
                 );
             """);
 
-            // 5. RAM Specs Table
+            // Memory specifications table
             stmt.execute("""
                 CREATE TABLE IF NOT EXISTS ram_specs (
                     component_id INTEGER PRIMARY KEY,
@@ -127,7 +112,7 @@ public class DatabaseManager {
                 );
             """);
 
-            // 6. PSU Specs Table
+            // Power supply specifications table
             stmt.execute("""
                 CREATE TABLE IF NOT EXISTS psu_specs (
                     component_id INTEGER PRIMARY KEY,
@@ -137,7 +122,7 @@ public class DatabaseManager {
                 );
             """);
 
-            // 7. Price History Table
+            // Historical price log table
             stmt.execute("""
                 CREATE TABLE IF NOT EXISTS price_history (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -149,7 +134,7 @@ public class DatabaseManager {
                 );
             """);
 
-            // 8. Builds Table
+            // Saved builds table
             stmt.execute("""
                 CREATE TABLE IF NOT EXISTS builds (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -158,7 +143,7 @@ public class DatabaseManager {
                 );
             """);
 
-            // 9. Build Items Table
+            // Parts assigned to saved builds
             stmt.execute("""
                 CREATE TABLE IF NOT EXISTS build_items (
                     build_id INTEGER NOT NULL,
@@ -169,27 +154,27 @@ public class DatabaseManager {
                 );
             """);
 
-            // 10. Performance Indexes
+            // Fast lookup indexes for common queries
             stmt.execute("CREATE INDEX IF NOT EXISTS idx_components_type ON components(type);");
             stmt.execute("CREATE INDEX IF NOT EXISTS idx_components_brand ON components(brand);");
             stmt.execute("CREATE INDEX IF NOT EXISTS idx_price_history_lookup ON price_history(component_id, fetched_at);");
         }
     }
 
-    /**
-     * Seeds starter hardware components if the database contains no components.
-     */
+    // Add starter hardware parts if the database is brand new
     private void seedInitialDataIfEmpty(Connection conn) throws SQLException {
+        // Check if we already have parts in the database
         try (Statement checkStmt = conn.createStatement();
              ResultSet rs = checkStmt.executeQuery("SELECT COUNT(*) AS count FROM components")) {
             if (rs.next() && rs.getInt("count") > 0) {
-                return; // Already populated
+                return;
             }
         }
 
+        // Insert sample hardware in a single atomic transaction
         conn.setAutoCommit(false);
         try {
-            // Seed 10 CPUs
+            // Seed sample processors
             insertCpu(conn, "AMD", "Ryzen 5 5500", 89.99, 65, "AM4", 6, 12, 3.6, 4.2, 19500);
             insertCpu(conn, "AMD", "Ryzen 5 5600", 124.99, 65, "AM4", 6, 12, 3.5, 4.4, 21500);
             insertCpu(conn, "AMD", "Ryzen 5 5600X", 144.99, 65, "AM4", 6, 12, 3.7, 4.6, 22000);
@@ -202,7 +187,7 @@ public class DatabaseManager {
             insertCpu(conn, "Intel", "Core i5-13600K", 269.99, 125, "LGA1700", 14, 20, 3.5, 5.1, 38200);
             insertCpu(conn, "Intel", "Core i5-14600K", 299.99, 125, "LGA1700", 14, 20, 3.5, 5.3, 39800);
 
-            // Seed 10 GPUs
+            // Seed sample graphics cards
             insertGpu(conn, "AMD", "Radeon RX 6600", 199.99, 132, 8, 132, 450, 78.5, 52.0, 26.5);
             insertGpu(conn, "AMD", "Radeon RX 6650 XT", 229.99, 180, 8, 180, 500, 89.2, 59.8, 31.0);
             insertGpu(conn, "AMD", "Radeon RX 6700 XT", 329.99, 230, 12, 230, 650, 112.4, 79.1, 44.2);
@@ -214,24 +199,25 @@ public class DatabaseManager {
             insertGpu(conn, "NVIDIA", "GeForce RTX 4060 Ti", 389.99, 160, 8, 160, 550, 118.0, 82.5, 43.5);
             insertGpu(conn, "Intel", "Arc A750", 199.99, 225, 8, 225, 550, 76.0, 53.5, 28.0);
 
-            // Seed Motherboards
+            // Seed sample motherboards
             insertMotherboard(conn, "MSI", "B550-A PRO", 109.99, 25, "AM4", "DDR4");
             insertMotherboard(conn, "ASUS", "TUF GAMING B650-PLUS", 199.99, 30, "AM5", "DDR5");
             insertMotherboard(conn, "MSI", "PRO B760-P WIFI DDR4", 139.99, 25, "LGA1700", "DDR4");
             insertMotherboard(conn, "Gigabyte", "B760 AORUS ELITE AX", 169.99, 30, "LGA1700", "DDR5");
 
-            // Seed RAM
+            // Seed sample memory kits
             insertRam(conn, "Corsair", "Vengeance LPX 16GB (2x8GB)", 39.99, 10, "DDR4", 16, 3200);
             insertRam(conn, "G.Skill", "Ripjaws V 32GB (2x16GB)", 64.99, 12, "DDR4", 32, 3600);
             insertRam(conn, "Kingston", "Fury Beast 16GB (2x8GB)", 59.99, 10, "DDR5", 16, 5600);
             insertRam(conn, "Corsair", "Vengeance 32GB (2x16GB)", 109.99, 15, "DDR5", 32, 6000);
 
-            // Seed PSUs
+            // Seed sample power supplies
             insertPsu(conn, "EVGA", "500 W1", 44.99, 0, 500, "80+ White");
             insertPsu(conn, "Corsair", "CX650M", 69.99, 0, 650, "80+ Bronze");
             insertPsu(conn, "Seasonic", "FOCUS GX-750", 109.99, 0, 750, "80+ Gold");
             insertPsu(conn, "Corsair", "RM850e", 119.99, 0, 850, "80+ Gold");
 
+            // Commit all sample parts to the database
             conn.commit();
         } catch (SQLException ex) {
             conn.rollback();
@@ -241,6 +227,7 @@ public class DatabaseManager {
         }
     }
 
+    // Insert common part details into the base components table
     private int insertBaseComponent(Connection conn, String type, String brand, String name, double price, int tdp) throws SQLException {
         String sql = "INSERT INTO components (type, brand, name, price, tdp_watts) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -262,6 +249,7 @@ public class DatabaseManager {
         throw new SQLException("Failed to retrieve generated key for component: " + name);
     }
 
+    // Save the starting price for a part in the price history table
     private void recordInitialPrice(Connection conn, int componentId, double price) throws SQLException {
         String sql = "INSERT INTO price_history (component_id, price, source) VALUES (?, ?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -272,6 +260,7 @@ public class DatabaseManager {
         }
     }
 
+    // Insert a processor and its specific hardware specs
     private void insertCpu(Connection conn, String brand, String name, double price, int tdp,
                            String socket, int cores, int threads, double base, double boost, int score) throws SQLException {
         int id = insertBaseComponent(conn, "CPU", brand, name, price, tdp);
@@ -288,6 +277,7 @@ public class DatabaseManager {
         }
     }
 
+    // Insert a graphics card and its FPS benchmarks
     private void insertGpu(Connection conn, String brand, String name, double price, int tdp,
                            int vram, int boardPower, int recPsu, double fps1080p, double fps1440p, double fps4k) throws SQLException {
         int id = insertBaseComponent(conn, "GPU", brand, name, price, tdp);
@@ -304,6 +294,7 @@ public class DatabaseManager {
         }
     }
 
+    // Insert a motherboard and its socket standard
     private void insertMotherboard(Connection conn, String brand, String name, double price, int tdp,
                                   String socket, String ramType) throws SQLException {
         int id = insertBaseComponent(conn, "MOTHERBOARD", brand, name, price, tdp);
@@ -316,6 +307,7 @@ public class DatabaseManager {
         }
     }
 
+    // Insert RAM specs including capacity and clock speed
     private void insertRam(Connection conn, String brand, String name, double price, int tdp,
                           String ramType, int capacity, int speed) throws SQLException {
         int id = insertBaseComponent(conn, "RAM", brand, name, price, tdp);
@@ -329,6 +321,7 @@ public class DatabaseManager {
         }
     }
 
+    // Insert power supply specs including rated wattage and efficiency rating
     private void insertPsu(Connection conn, String brand, String name, double price, int tdp,
                           int wattage, String rating) throws SQLException {
         int id = insertBaseComponent(conn, "PSU", brand, name, price, tdp);

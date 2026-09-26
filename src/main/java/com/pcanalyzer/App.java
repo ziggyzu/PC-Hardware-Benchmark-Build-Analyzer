@@ -8,22 +8,14 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-
-/**
- * Main application entry point for the PC Hardware Benchmark & Build Analyzer.
- *
- * Design Decision:
- * 1. JavaFX Lifecycle: Extends javafx.application.Application to manage UI lifecycle
- *    (init, start, stop).
- * 2. Clean Separation: Application class solely bootstraps the primary Stage,
- *    delegating UI assembly to FXML loaders and business logic to controllers/services.
- */
+// Main entry point that starts the desktop app
 public class App extends Application {
 
     private static final String APP_TITLE = "PC Hardware Benchmark & Build Analyzer";
     private static final double MIN_WIDTH = 1080;
     private static final double MIN_HEIGHT = 720;
 
+    // Load the layout file and display the main application window
     @Override
     public void start(Stage primaryStage) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/pcanalyzer/view/main-view.fxml"));
@@ -39,6 +31,14 @@ public class App extends Application {
         primaryStage.show();
     }
 
+    // Shut down background worker threads when closing the app
+    @Override
+    public void stop() throws Exception {
+        com.pcanalyzer.util.ThreadPoolManager.getInstance().shutdown();
+        super.stop();
+    }
+
+    // Launch the application
     public static void main(String[] args) {
         launch(args);
     }

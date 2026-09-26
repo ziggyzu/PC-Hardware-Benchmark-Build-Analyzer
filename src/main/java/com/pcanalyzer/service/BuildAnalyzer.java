@@ -3,34 +3,22 @@ package com.pcanalyzer.service;
 import com.pcanalyzer.model.Cpu;
 import com.pcanalyzer.model.Gpu;
 
-/**
- * Service providing price-to-performance calculations and benchmark analysis.
- *
- * Design Decision:
- * Isolates numerical analysis algorithms into a dedicated service.
- * Allows comparing components objectively (e.g. Dollar-per-FPS, Benchmark-per-Dollar).
- */
+// Calculates price-to-performance metrics like score per dollar and frames per dollar
 public class BuildAnalyzer {
 
-    /**
-     * Calculate cost per benchmark point for a CPU ($ / point). Lower is better value.
-     */
+    // Calculate how many dollars each CPU benchmark point costs (lower is better)
     public double calculateCpuCostPerPoint(Cpu cpu) {
         if (cpu == null || cpu.getBenchmarkScore() <= 0) return 0.0;
         return cpu.getPrice() / cpu.getBenchmarkScore();
     }
 
-    /**
-     * Calculate benchmark points per dollar for a CPU (points / $). Higher is better value.
-     */
+    // Calculate how many benchmark points you get per dollar spent (higher is better)
     public double calculateCpuPointsPerDollar(Cpu cpu) {
         if (cpu == null || cpu.getPrice() <= 0) return 0.0;
         return cpu.getBenchmarkScore() / cpu.getPrice();
     }
 
-    /**
-     * Calculate cost per frame for a GPU at a specified resolution ($ / FPS). Lower is better value.
-     */
+    // Calculate how much each gaming frame per second costs in dollars (lower is better)
     public double calculateGpuCostPerFps(Gpu gpu, String resolution) {
         if (gpu == null) return 0.0;
         double fps = gpu.getFpsForResolution(resolution);
@@ -38,9 +26,7 @@ public class BuildAnalyzer {
         return gpu.getPrice() / fps;
     }
 
-    /**
-     * Calculate frames per dollar for a GPU (FPS / $). Higher is better value.
-     */
+    // Calculate how many gaming frames per second you get for each dollar (higher is better)
     public double calculateGpuFpsPerDollar(Gpu gpu, String resolution) {
         if (gpu == null || gpu.getPrice() <= 0) return 0.0;
         double fps = gpu.getFpsForResolution(resolution);

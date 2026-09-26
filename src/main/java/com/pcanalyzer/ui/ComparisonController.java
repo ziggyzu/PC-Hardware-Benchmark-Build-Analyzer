@@ -19,78 +19,73 @@ import javafx.scene.layout.*;
 
 import java.util.List;
 
-/**
- * Controller for the Performance Comparisons tab.
- *
- * Demonstrates:
- * 1. Rich JavaFX UI Design: Nested SplitPanes, TitledPanes, BarCharts, CategoryAxis, NumberAxis, GridPane, ComboBoxes.
- * 2. Layout Responsiveness: Height and width property constraints relative to parent SplitPanes, and proportional ColumnConstraints.
- * 3. Reactive Analytics: Auto-refreshes multi-series charts on category or resolution changes.
- */
+// Controls the comparison tab where users compare speeds, frame rates, and value
 public class ComparisonController {
 
-    // Main layout
+    // Main layout panes
     @FXML private VBox comparisonRoot;
     @FXML private SplitPane verticalSplitPane;
     @FXML private SplitPane bottomSplitPane;
 
-    // Toolbar controls
+    // Filter selectors
     @FXML private ComboBox<String> categoryComboBox;
     @FXML private ComboBox<String> resolutionComboBox;
     @FXML private Label resolutionLabel;
 
-    // Main benchmark chart
+    // Primary speed comparison chart
     @FXML private BarChart<String, Number> mainBarChart;
     @FXML private CategoryAxis mainXAxis;
     @FXML private NumberAxis mainYAxis;
 
-    // Price-to-performance chart
+    // Price to performance chart
     @FXML private BarChart<String, Number> valueBarChart;
     @FXML private CategoryAxis valueXAxis;
     @FXML private NumberAxis valueYAxis;
 
-    // Head-to-head comparison
+    // Side-by-side comparison selectors and grid
     @FXML private ComboBox<Component> compareComboA;
     @FXML private ComboBox<Component> compareComboB;
     @FXML private GridPane comparisonGrid;
 
+    // Helper tools
     private ComponentDao componentDao;
     private final BuildAnalyzer buildAnalyzer = new BuildAnalyzer();
 
+    // Set up responsive chart heights, dropdown items, and listeners
     @FXML
     public void initialize() {
-        // 1. Layout Responsiveness: Bind chart minimum heights relative to vertical SplitPane height
+        // Keep charts nicely proportioned when resizing the window
         mainBarChart.minHeightProperty().bind(verticalSplitPane.heightProperty().multiply(0.35));
         valueBarChart.minHeightProperty().bind(bottomSplitPane.heightProperty().multiply(0.40));
 
-        // 2. Category selector
+        // Choose between graphics cards or processors
         categoryComboBox.setItems(FXCollections.observableArrayList("GPU (Graphics Card)", "CPU (Processor)"));
         categoryComboBox.getSelectionModel().selectFirst();
         categoryComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> onCategoryChanged());
 
-        // 3. Resolution selector (GPU-only)
+        // Choose resolution for gaming benchmarks
         resolutionComboBox.setItems(FXCollections.observableArrayList("1080p (FHD)", "1440p (QHD)", "4K (UHD)"));
         resolutionComboBox.getSelectionModel().selectFirst();
         resolutionComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> refreshCharts());
 
-        // 4. Head-to-head selection listeners
+        // Update the head-to-head comparison table whenever a new part is chosen
         compareComboA.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> updateHeadToHead());
         compareComboB.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> updateHeadToHead());
     }
 
-    /**
-     * Receives the DAO from MainController.
-     */
+    // Connect the database and draw the initial charts
     public void setComponentDao(ComponentDao componentDao) {
         this.componentDao = componentDao;
         refreshCharts();
     }
 
+    // Redraw all charts
     @FXML
-    private void handleRefresh() {
+    public void handleRefresh() {
         refreshCharts();
     }
 
+    // Show or hide the resolution dropdown based on whether GPUs or CPUs are selected
     private void onCategoryChanged() {
         String category = categoryComboBox.getSelectionModel().getSelectedItem();
         boolean isGpu = category != null && category.startsWith("GPU");
@@ -101,42 +96,50 @@ public class ComparisonController {
         refreshCharts();
     }
 
-    /**
-     * Rebuilds all chart series and head-to-head selectors based on current category.
-     */
+    // Grab data in the background and redraw all charts
     private void refreshCharts() {
         if (componentDao == null) return;
 
         String category = categoryComboBox.getSelectionModel().getSelectedItem();
         if (category == null) return;
 
-        if (category.startsWith("GPU")) {
-            List<Gpu> gpus = componentDao.findByType(ComponentType.GPU).stream()
-                    .map(c -> (Gpu) c)
-                    .toList();
-            buildGpuFpsChart(gpus);
-            buildGpuValueChart(gpus);
-            populateHeadToHeadSelectors(componentDao.findByType(ComponentType.GPU));
-        } else {
-            List<Cpu> cpus = componentDao.findByType(ComponentType.CPU).stream()
-                    .map(c -> (Cpu) c)
-                    .toList();
-            buildCpuBenchmarkChart(cpus);
-            buildCpuValueChart(cpus);
-            populateHeadToHeadSelectors(componentDao.findByType(ComponentType.CPU));
-        }
+        boolean isGpu = category.startsWith("GPU");
+
+        // Load the parts list on a background thread so the window doesn't freeze
+        javafx.concurrent.Task<List<Component>> chartDataTask = new javafx.concurrent.Task<>() {
+            @Override
+            protected List<Component> call() {
+                ComponentType type = isGpu ? ComponentType.GPU : ComponentType.CPU;
+                return componentDao.findByType(type);
+            }
+        };
+
+        // When the query finishes, update both charts on the screen
+        chartDataTask.setOnSucceeded(event -> {
+            List<Component> components = chartDataTask.getValue();
+            if (isGpu) {
+                List<Gpu> gpus = components.stream().map(c -> (Gpu) c).toList();
+                buildGpuFpsChart(gpus);
+                buildGpuValueChart(gpus);
+            } else {
+                List<Cpu> cpus = components.stream().map(c -> (Cpu) c).toList();
+                buildCpuBenchmarkChart(cpus);
+                buildCpuValueChart(cpus);
+            }
+            populateHeadToHeadSelectors(components);
+        });
+
+        com.pcanalyzer.util.ThreadPoolManager.getInstance().submitTask(chartDataTask);
     }
 
-    // =====================================================================
-    // GPU Charts
-    // =====================================================================
-
+    // Draw the GPU gaming frame rate bar chart
     private void buildGpuFpsChart(List<Gpu> gpus) {
         mainBarChart.getData().clear();
         mainBarChart.setTitle("GPU Gaming FPS Comparison (Multi-Resolution)");
         mainXAxis.setLabel("GPU Model");
         mainYAxis.setLabel("Average Frames Per Second (FPS)");
 
+        // Create bars for 1080p, 1440p, and 4K
         XYChart.Series<String, Number> series1080 = new XYChart.Series<>();
         series1080.setName("1080p (FHD)");
         XYChart.Series<String, Number> series1440 = new XYChart.Series<>();
@@ -144,6 +147,7 @@ public class ComparisonController {
         XYChart.Series<String, Number> series4k = new XYChart.Series<>();
         series4k.setName("4K (UHD)");
 
+        // Add each graphics card to the chart
         for (Gpu gpu : gpus) {
             String label = gpu.getBrand() + " " + gpu.getName();
             series1080.getData().add(new XYChart.Data<>(label, gpu.getFps1080p()));
@@ -154,6 +158,7 @@ public class ComparisonController {
         mainBarChart.getData().addAll(series1080, series1440, series4k);
     }
 
+    // Draw the GPU price-to-performance value chart
     private void buildGpuValueChart(List<Gpu> gpus) {
         valueBarChart.getData().clear();
         String resolution = getSelectedResolutionKey();
@@ -167,6 +172,7 @@ public class ComparisonController {
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName("$/FPS");
 
+        // Calculate and add cost per frame for each GPU
         for (Gpu gpu : gpus) {
             String label = gpu.getBrand() + " " + gpu.getName();
             double costPerFps = buildAnalyzer.calculateGpuCostPerFps(gpu, resolution);
@@ -178,10 +184,7 @@ public class ComparisonController {
         valueBarChart.getData().add(series);
     }
 
-    // =====================================================================
-    // CPU Charts
-    // =====================================================================
-
+    // Draw the processor benchmark score chart
     private void buildCpuBenchmarkChart(List<Cpu> cpus) {
         mainBarChart.getData().clear();
         mainBarChart.setTitle("CPU Multi-Threaded Benchmark Score (Higher is Better)");
@@ -191,6 +194,7 @@ public class ComparisonController {
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName("Benchmark Score");
 
+        // Add benchmark scores for each CPU
         for (Cpu cpu : cpus) {
             String label = cpu.getBrand() + " " + cpu.getName();
             series.getData().add(new XYChart.Data<>(label, cpu.getBenchmarkScore()));
@@ -199,6 +203,7 @@ public class ComparisonController {
         mainBarChart.getData().add(series);
     }
 
+    // Draw the CPU value chart showing points per dollar
     private void buildCpuValueChart(List<Cpu> cpus) {
         valueBarChart.getData().clear();
         valueBarChart.setTitle("CPU Value Efficiency (Points per Dollar — Higher is Better)");
@@ -208,6 +213,7 @@ public class ComparisonController {
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName("Points/$");
 
+        // Calculate points per dollar for each CPU
         for (Cpu cpu : cpus) {
             String label = cpu.getBrand() + " " + cpu.getName();
             double pointsPerDollar = buildAnalyzer.calculateCpuPointsPerDollar(cpu);
@@ -219,10 +225,7 @@ public class ComparisonController {
         valueBarChart.getData().add(series);
     }
 
-    // =====================================================================
-    // Head-to-Head Comparison
-    // =====================================================================
-
+    // Fill the two head-to-head comparison dropdowns
     private void populateHeadToHeadSelectors(List<Component> components) {
         ObservableList<Component> items = FXCollections.observableArrayList(components);
 
@@ -232,6 +235,7 @@ public class ComparisonController {
         compareComboA.setItems(items);
         compareComboB.setItems(items);
 
+        // Keep previous selections if they're still in the list
         if (prevA != null && items.contains(prevA)) {
             compareComboA.getSelectionModel().select(prevA);
         } else if (!items.isEmpty()) {
@@ -247,6 +251,7 @@ public class ComparisonController {
         }
     }
 
+    // Build the side-by-side comparison table
     private void updateHeadToHead() {
         comparisonGrid.getChildren().clear();
         comparisonGrid.getColumnConstraints().clear();
@@ -255,7 +260,7 @@ public class ComparisonController {
         Component b = compareComboB.getSelectionModel().getSelectedItem();
         if (a == null || b == null) return;
 
-        // Proportional column constraints: Spec (40%), Value A (30%), Value B (30%)
+        // Size the columns proportionally
         ColumnConstraints specCol = new ColumnConstraints();
         specCol.setPercentWidth(40);
         ColumnConstraints valACol = new ColumnConstraints();
@@ -266,15 +271,15 @@ public class ComparisonController {
         valBCol.setHalignment(HPos.CENTER);
         comparisonGrid.getColumnConstraints().addAll(specCol, valACol, valBCol);
 
-        // Header row
+        // Add the table header
         addComparisonHeader(0, "Specification", a.getBrand() + " " + a.getName(), b.getBrand() + " " + b.getName());
 
         int row = 1;
-        // Common fields
+        // Compare price and wattage
         row = addComparisonRow(row, "Price", String.format("$%.2f", a.getPrice()), String.format("$%.2f", b.getPrice()), a.getPrice(), b.getPrice(), true);
         row = addComparisonRow(row, "TDP", a.getTdpWatts() + " W", b.getTdpWatts() + " W", a.getTdpWatts(), b.getTdpWatts(), true);
 
-        // Type-specific fields
+        // Compare CPU-specific specs
         if (a instanceof Cpu cpuA && b instanceof Cpu cpuB) {
             row = addComparisonRow(row, "Socket", cpuA.getSocket(), cpuB.getSocket(), 0, 0, false);
             row = addComparisonRow(row, "Cores", String.valueOf(cpuA.getCores()), String.valueOf(cpuB.getCores()), cpuA.getCores(), cpuB.getCores(), false);
@@ -286,6 +291,7 @@ public class ComparisonController {
             double ppdB = buildAnalyzer.calculateCpuPointsPerDollar(cpuB);
             row = addComparisonRow(row, "Points/$", String.format("%.1f", ppdA), String.format("%.1f", ppdB), ppdA, ppdB, false);
         } else if (a instanceof Gpu gpuA && b instanceof Gpu gpuB) {
+            // Compare GPU-specific specs
             row = addComparisonRow(row, "VRAM", gpuA.getVramGb() + " GB", gpuB.getVramGb() + " GB", gpuA.getVramGb(), gpuB.getVramGb(), false);
             row = addComparisonRow(row, "Board Power", gpuA.getBoardPowerWatts() + " W", gpuB.getBoardPowerWatts() + " W", gpuA.getBoardPowerWatts(), gpuB.getBoardPowerWatts(), true);
             row = addComparisonRow(row, "FPS 1080p", String.format("%.1f", gpuA.getFps1080p()), String.format("%.1f", gpuB.getFps1080p()), gpuA.getFps1080p(), gpuB.getFps1080p(), false);
@@ -298,6 +304,7 @@ public class ComparisonController {
         }
     }
 
+    // Add a title header to the comparison grid
     private void addComparisonHeader(int row, String specText, String nameA, String nameB) {
         Label specLabel = new Label(specText);
         specLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #1e3a8a;");
@@ -313,6 +320,7 @@ public class ComparisonController {
         comparisonGrid.add(labelB, 2, row);
     }
 
+    // Add a comparison row and highlight the better value in green
     private int addComparisonRow(int row, String specName, String valueA, String valueB,
                                   double numA, double numB, boolean lowerIsBetter) {
         Label specLabel = new Label(specName);
@@ -327,7 +335,7 @@ public class ComparisonController {
         labelB.setPadding(new Insets(2, 4, 2, 4));
         labelB.setMaxWidth(Double.MAX_VALUE);
 
-        // Highlight winner and loser
+        // Highlight the winner in green and the loser in red
         if (numA != numB && numA != 0 && numB != 0) {
             boolean aWins = lowerIsBetter ? (numA < numB) : (numA > numB);
             if (aWins) {
@@ -346,6 +354,7 @@ public class ComparisonController {
         return row + 1;
     }
 
+    // Convert the resolution dropdown text into a key for lookup
     private String getSelectedResolutionKey() {
         String selected = resolutionComboBox.getSelectionModel().getSelectedItem();
         if (selected == null) return "1080p";

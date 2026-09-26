@@ -2,20 +2,10 @@ package com.pcanalyzer.model;
 
 import java.util.Objects;
 
-/**
- * Abstract base class for all PC hardware components.
- *
- * Design Decision:
- * 1. Inheritance & Polymorphism: All components share common business attributes
- *    (ID, type, brand, name, price, and TDP wattage). By abstracting these into
- *    a base class, collections of components can be manipulated uniformly (e.g.
- *    in UI tables, build inventories, and price trackers).
- * 2. Pure Domain Model: Notice there are NO JavaFX dependencies (such as SimpleStringProperty).
- *    Keeping models as plain Java objects (POJOs) makes them lightweight, serializable,
- *    and easily unit-testable without initializing the JavaFX runtime.
- */
+// Base class that all computer parts inherit from
 public abstract class Component {
 
+    // Common fields shared by every PC component
     private Integer id;
     private final ComponentType type;
     private String brand;
@@ -23,16 +13,7 @@ public abstract class Component {
     private double price;
     private int tdpWatts;
 
-    /**
-     * Constructs a new Component.
-     *
-     * @param id Database identifier (null if not yet persisted)
-     * @param type The category of component
-     * @param brand Manufacturer brand (e.g., AMD, Intel, NVIDIA)
-     * @param name Model name (e.g., Ryzen 5 5600, RTX 4060)
-     * @param price Current retail price in USD
-     * @param tdpWatts Thermal Design Power in Watts
-     */
+    // Set up the basic info for any component
     protected Component(Integer id, ComponentType type, String brand, String name, double price, int tdpWatts) {
         this.id = id;
         this.type = Objects.requireNonNull(type, "ComponentType must not be null");
@@ -42,6 +23,7 @@ public abstract class Component {
         this.tdpWatts = Math.max(0, tdpWatts);
     }
 
+    // Getters and setters for the basic component details
     public Integer getId() {
         return id;
     }
@@ -86,14 +68,10 @@ public abstract class Component {
         this.tdpWatts = Math.max(0, tdpWatts);
     }
 
-    /**
-     * Polymorphic method to return a concise human-readable summary of component-specific specs.
-     * Subclasses override this to supply details such as socket/cores for CPUs or VRAM for GPUs.
-     *
-     * @return Summary string suitable for table cells or tooltips.
-     */
+    // Each specific part decides how to summarize its own specs
     public abstract String getKeySpecs();
 
+    // Check if two components are the same item
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -105,11 +83,13 @@ public abstract class Component {
                Objects.equals(name, component.name);
     }
 
+    // Generate a hash code based on component identity
     @Override
     public int hashCode() {
         return Objects.hash(id, type, brand, name);
     }
 
+    // Display a clean text label showing part name and price
     @Override
     public String toString() {
         return String.format("[%s] %s %s ($%.2f)", type, brand, name, price);

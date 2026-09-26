@@ -2,19 +2,14 @@ package com.pcanalyzer.model;
 
 import java.util.Objects;
 
-/**
- * Represents a Power Supply Unit (PSU).
- *
- * Design Decision:
- * Holds the rated maximum wattage and efficiency rating.
- * The compatibility engine uses wattage to check against the combined
- * CPU TDP + GPU Board Power + system overhead.
- */
+// Power supply (PSU) details like maximum wattage and efficiency badge
 public class Psu extends Component {
 
+    // Total power output in watts and efficiency rating (like 80 Plus Gold)
     private int wattage;
     private String efficiencyRating;
 
+    // Create a new power supply entry
     public Psu(Integer id, String brand, String name, double price, int tdpWatts,
                int wattage, String efficiencyRating) {
         super(id, ComponentType.PSU, brand, name, price, tdpWatts);
@@ -22,6 +17,7 @@ public class Psu extends Component {
         this.efficiencyRating = Objects.requireNonNullElse(efficiencyRating, "Standard");
     }
 
+    // Getters and setters for power supply specs
     public int getWattage() {
         return wattage;
     }
@@ -38,6 +34,7 @@ public class Psu extends Component {
         this.efficiencyRating = Objects.requireNonNullElse(efficiencyRating, "Standard");
     }
 
+    // Show the wattage and efficiency certification
     @Override
     public String getKeySpecs() {
         return String.format("%dW (%s)", wattage, efficiencyRating);

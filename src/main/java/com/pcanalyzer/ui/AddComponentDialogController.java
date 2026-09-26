@@ -8,15 +8,10 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
-/**
- * Controller for the Add Component modal dialog.
- *
- * Design Decision:
- * 1. Thin Controller: Validates form input, creates the domain entity, and delegates persistence to ComponentDao.
- * 2. Dynamic Spec Form: Switches visible input fields based on the selected ComponentType.
- */
+// Popup dialog controller for adding new components to the database
 public class AddComponentDialogController {
 
+    // Common fields
     @FXML private ComboBox<ComponentType> typeComboBox;
     @FXML private TextField brandField;
     @FXML private TextField nameField;
@@ -57,7 +52,7 @@ public class AddComponentDialogController {
     @FXML private TextField psuWattageField;
     @FXML private TextField psuRatingField;
 
-    // Security Field
+    // Password field for admin authentication
     @FXML private PasswordField adminPasswordField;
 
     @FXML private Label errorLabel;
@@ -66,12 +61,13 @@ public class AddComponentDialogController {
     private Stage dialogStage;
     private boolean componentAdded = false;
 
+    // Initialize the type dropdown and show CPU form by default
     @FXML
     public void initialize() {
         typeComboBox.setItems(FXCollections.observableArrayList(ComponentType.values()));
         typeComboBox.getSelectionModel().select(ComponentType.CPU);
 
-        // Switch visible form when category changes
+        // Switch visible inputs when a different category is chosen
         typeComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             switchSpecForm(newVal);
         });
@@ -79,18 +75,22 @@ public class AddComponentDialogController {
         switchSpecForm(ComponentType.CPU);
     }
 
+    // Set the database DAO helper
     public void setComponentDao(ComponentDao componentDao) {
         this.componentDao = componentDao;
     }
 
+    // Pass the window stage so we can close it when done
     public void setDialogStage(Stage dialogStage) {
         this.dialogStage = dialogStage;
     }
 
+    // Check if the user successfully saved a new part
     public boolean isComponentAdded() {
         return componentAdded;
     }
 
+    // Show only the form fields relevant to the selected hardware type
     private void switchSpecForm(ComponentType type) {
         cpuForm.setVisible(type == ComponentType.CPU);
         gpuForm.setVisible(type == ComponentType.GPU);
@@ -99,6 +99,7 @@ public class AddComponentDialogController {
         psuForm.setVisible(type == ComponentType.PSU);
     }
 
+    // Validate inputs, verify password, and save the part to SQLite
     @FXML
     private void handleSave() {
         errorLabel.setText("");
@@ -107,19 +108,22 @@ public class AddComponentDialogController {
             String brand = brandField.getText() != null ? brandField.getText().trim() : "";
             String name = nameField.getText() != null ? nameField.getText().trim() : "";
 
+            // Make sure brand and name are filled in
             if (brand.isEmpty() || name.isEmpty()) {
                 throw new IllegalArgumentException("Brand and Model Name are required.");
             }
 
-            // Security check using PasswordField
+            // Check if the admin password is correct
             String passkey = adminPasswordField.getText() != null ? adminPasswordField.getText().trim() : "";
             if (!passkey.isEmpty() && !passkey.equals("admin123")) {
                 throw new IllegalArgumentException("Invalid Admin Passkey. Enter 'admin123' or leave blank for guest access.");
             }
 
+            // Parse common numbers
             double price = Double.parseDouble(priceField.getText().trim());
             int tdp = Integer.parseInt(tdpField.getText().trim());
 
+            // Build the specific component based on its category
             Component created;
             switch (type) {
                 case CPU -> {
@@ -164,6 +168,7 @@ public class AddComponentDialogController {
                 default -> throw new IllegalStateException("Unexpected component type: " + type);
             }
 
+            // Save to database and close dialog
             componentDao.save(created);
             componentAdded = true;
             dialogStage.close();
@@ -176,6 +181,7 @@ public class AddComponentDialogController {
         }
     }
 
+    // Close the dialog without saving
     @FXML
     private void handleCancel() {
         if (dialogStage != null) {

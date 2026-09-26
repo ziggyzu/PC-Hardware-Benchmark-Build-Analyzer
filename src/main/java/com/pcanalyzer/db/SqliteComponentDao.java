@@ -12,21 +12,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-/**
- * SQLite JDBC implementation of ComponentDao.
- *
- * Design Decision:
- * 1. PreparedStatements Only: Prevents SQL injection and optimizes query plan caching.
- * 2. Polymorphic Reconstitution via Single-Pass LEFT JOIN: Rather than executing N+1 queries,
- *    a single SELECT with LEFT JOINs hydrates the base component and its specialized specs
- *    in one round-trip.
- * 3. Atomic Transactions: Save/Update operations modify both the base table and spec table
- *    within a transaction (setAutoCommit(false) + commit()/rollback()) to preserve integrity.
- */
+// Handles loading, inserting, updating, and deleting parts from SQLite tables
 public class SqliteComponentDao implements ComponentDao {
 
     private final DatabaseManager dbManager;
 
+    // Single query joining the base parts table with all specification tables
     private static final String BASE_SELECT_QUERY = """
         SELECT c.id, c.type, c.brand, c.name, c.price, c.tdp_watts,
                cs.socket AS cpu_socket, cs.cores, cs.threads, cs.base_clock, cs.boost_clock, cs.benchmark_score,
@@ -42,10 +33,12 @@ public class SqliteComponentDao implements ComponentDao {
         LEFT JOIN psu_specs ps ON c.id = ps.component_id
     """;
 
+    // Set up with our database manager
     public SqliteComponentDao(DatabaseManager dbManager) {
         this.dbManager = Objects.requireNonNull(dbManager, "DatabaseManager cannot be null");
     }
 
+    // Read every component in the catalog from SQLite
     @Override
     public List<Component> findAll() {
         String sql = BASE_SELECT_QUERY + " ORDER BY c.type, c.brand, c.name";
@@ -63,6 +56,7 @@ public class SqliteComponentDao implements ComponentDao {
         return list;
     }
 
+    // Read only components of a chosen type like CPU or GPU
     @Override
     public List<Component> findByType(ComponentType type) {
         if (type == null) return findAll();
@@ -83,6 +77,7 @@ public class SqliteComponentDao implements ComponentDao {
         return list;
     }
 
+    // Look up one specific component by its database ID
     @Override
     public Optional<Component> findById(int id) {
         String sql = BASE_SELECT_QUERY + " WHERE c.id = ?";
@@ -100,6 +95,7 @@ public class SqliteComponentDao implements ComponentDao {
         return Optional.empty();
     }
 
+    // Save a component (inserts if new, updates if already existing)
     @Override
     public Component save(Component component) {
         Objects.requireNonNull(component, "Component cannot be null");
@@ -110,6 +106,7 @@ public class SqliteComponentDao implements ComponentDao {
         }
     }
 
+    // Delete a component by its ID number
     @Override
     public boolean deleteById(int id) {
         String sql = "DELETE FROM components WHERE id = ?";
@@ -124,6 +121,7 @@ public class SqliteComponentDao implements ComponentDao {
         }
     }
 
+    // Insert a new component and its specs into the database
     private Component insertComponent(Component comp) {
         String baseSql = "INSERT INTO components (type, brand, name, price, tdp_watts) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = dbManager.getConnection()) {
@@ -148,10 +146,10 @@ public class SqliteComponentDao implements ComponentDao {
                     }
                 }
 
-                // Insert spec row
+                // Insert the matching hardware specs row
                 insertSpecs(conn, comp);
 
-                // Insert initial price history record
+                // Add an entry in the price history table
                 insertPriceHistory(conn, generatedId, comp.getPrice(), "MANUAL_ENTRY");
 
                 conn.commit();
@@ -168,6 +166,7 @@ public class SqliteComponentDao implements ComponentDao {
         }
     }
 
+    // Update an existing component and its specs in the database
     private Component updateComponent(Component comp) {
         String baseSql = "UPDATE components SET brand = ?, name = ?, price = ?, tdp_watts = ? WHERE id = ?";
         try (Connection conn = dbManager.getConnection()) {
@@ -182,10 +181,10 @@ public class SqliteComponentDao implements ComponentDao {
                     pstmt.executeUpdate();
                 }
 
-                // Update spec row
+                // Update the matching hardware specs row
                 updateSpecs(conn, comp);
 
-                // Record price in history
+                // Record the updated price in the history table
                 insertPriceHistory(conn, comp.getId(), comp.getPrice(), "PRICE_UPDATE");
 
                 conn.commit();
@@ -202,6 +201,7 @@ public class SqliteComponentDao implements ComponentDao {
         }
     }
 
+    // Insert category-specific details into the right specification table
     private void insertSpecs(Connection conn, Component comp) throws SQLException {
         switch (comp.getType()) {
             case CPU -> {
@@ -266,6 +266,7 @@ public class SqliteComponentDao implements ComponentDao {
         }
     }
 
+    // Update category-specific details in the right specification table
     private void updateSpecs(Connection conn, Component comp) throws SQLException {
         switch (comp.getType()) {
             case CPU -> {
@@ -330,6 +331,7 @@ public class SqliteComponentDao implements ComponentDao {
         }
     }
 
+    // Add a price check entry into the price history table
     private void insertPriceHistory(Connection conn, int componentId, double price, String source) throws SQLException {
         String sql = "INSERT INTO price_history (component_id, price, source) VALUES (?, ?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -340,6 +342,7 @@ public class SqliteComponentDao implements ComponentDao {
         }
     }
 
+    // Convert an SQL database row into the proper Java component object
     private Component mapRowToComponent(ResultSet rs) throws SQLException {
         int id = rs.getInt("id");
         String typeStr = rs.getString("type");
