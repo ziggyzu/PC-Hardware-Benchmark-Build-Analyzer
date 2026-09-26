@@ -72,4 +72,46 @@ public class HardwareSyncServiceTest {
         List<Component> all = componentDao.findAll();
         assertFalse(all.isEmpty(), "Catalog should contain hardware components");
     }
+
+    @Test
+    public void testSyncFromLocalJsonFile() throws Exception {
+        HardwareSyncService syncService = new HardwareSyncService(componentDao, priceHistoryDao);
+        File localFile = new File("data/hardware-pricing.json");
+
+        assertTrue(localFile.exists(), "Local JSON data file should exist at data/hardware-pricing.json");
+
+        HardwareSyncService.SyncResult result = syncService.performSyncFromLocalFile(localFile);
+        assertNotNull(result, "SyncResult should not be null");
+        assertTrue(result.success(), "Local JSON file sync should succeed");
+        assertNotNull(result.rawJson(), "Raw JSON payload should be populated");
+        assertTrue(result.rawJson().contains("Ryzen 5 5600"), "Raw JSON should contain parsed item Ryzen 5 5600");
+    }
+
+    @Test
+    public void testParseAndApplyJsonString() throws Exception {
+        HardwareSyncService syncService = new HardwareSyncService(componentDao, priceHistoryDao);
+
+        String customJson = """
+            [
+                {"brand": "AMD", "name": "Ryzen 5 5600", "price": 99.99, "source": "UnitTest_Source"}
+            ]
+            """;
+
+        HardwareSyncService.SyncResult result = syncService.parseAndApplyJson(
+                customJson, "UnitTest", "Unit Test Execution", Thread.currentThread().getName()
+        );
+
+        assertNotNull(result);
+        assertTrue(result.success());
+        assertEquals(1, result.updatedCount(), "Should update exactly 1 matching component price");
+
+        Component comp = componentDao.findAll().stream()
+                .filter(c -> c.getName().equals("Ryzen 5 5600"))
+                .findFirst()
+                .orElse(null);
+
+        assertNotNull(comp, "Component Ryzen 5 5600 should exist in database");
+        assertEquals(99.99, comp.getPrice(), 0.001, "Component price should be updated to 99.99");
+    }
 }
+

@@ -12,6 +12,9 @@ import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
+
+import java.io.File;
 
 // Main controller that connects the header, tabs, and status bar together
 public class MainController {
@@ -94,47 +97,139 @@ public class MainController {
     // Fetch the latest market prices in the background without freezing the window
     @FXML
     public void handleSyncMarketData() {
+        executeSyncTask(false);
+    }
+
+    // Fetch market prices over HTTP and show a detailed JSON request & parsing demonstration dialog
+    @FXML
+    public void handleSyncMarketDataWithDemo() {
+        executeSyncTask(true);
+    }
+
+    // Internal helper to handle HTTP sync execution
+    private void executeSyncTask(boolean showDetailedDemo) {
         if (hardwareSyncService == null) return;
 
-        // Show that the sync is running
-        setStatusMessage("Dispatching live market sync to worker thread pool...");
+        setStatusMessage("Dispatching live HTTP market sync to worker thread pool...");
         if (threadPoolStatusLabel != null) {
             threadPoolStatusLabel.setText("⚡ ThreadPool: Syncing HTTP/JSON...");
         }
 
-        // Run the background sync job
         hardwareSyncService.syncAsynchronously(
                 result -> {
-                    // Update the status and refresh the screens once finished
-                    setStatusMessage(result.message());
-                    if (threadPoolStatusLabel != null) {
-                        threadPoolStatusLabel.setText("⚡ ThreadPool: 4 Workers Ready");
-                    }
-                    if (browseViewController != null) {
-                        browseViewController.loadComponentsFromDatabase();
-                    }
-                    if (comparisonViewController != null) {
-                        comparisonViewController.handleRefresh();
-                    }
-
-                    // Alert the user that the sync succeeded
-                    Alert info = new Alert(Alert.AlertType.INFORMATION);
-                    info.setTitle("Sync Complete");
-                    info.setHeaderText("Market Data Synchronized");
-                    info.setContentText(result.message() + "\nSource: " + result.source());
-                    info.showAndWait();
+                    onSyncComplete(result, showDetailedDemo);
                 },
                 error -> {
-                    // Alert the user if the sync failed
-                    setStatusMessage("Sync error: " + error.getMessage());
-                    if (threadPoolStatusLabel != null) {
-                        threadPoolStatusLabel.setText("⚡ ThreadPool: 4 Workers Ready");
-                    }
-                    Alert err = new Alert(Alert.AlertType.ERROR, "Sync failed: " + error.getMessage());
-                    err.showAndWait();
+                    onSyncError(error);
                 }
         );
     }
+
+    // Open a FileChooser dialog to select and parse a manual local JSON file
+    @FXML
+    public void handleImportLocalJsonFile() {
+        if (hardwareSyncService == null) return;
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select Hardware Pricing JSON File");
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("JSON Files (*.json)", "*.json")
+        );
+
+        // Pre-select data directory if present
+        File dataDir = new File("data");
+        if (dataDir.exists() && dataDir.isDirectory()) {
+            fileChooser.setInitialDirectory(dataDir);
+        }
+
+        File selectedFile = fileChooser.showOpenDialog(
+                rootBorderPane != null ? rootBorderPane.getScene().getWindow() : null
+        );
+
+        if (selectedFile == null) return;
+
+        setStatusMessage("Parsing local JSON file [" + selectedFile.getName() + "]...");
+        if (threadPoolStatusLabel != null) {
+            threadPoolStatusLabel.setText("⚡ ThreadPool: Parsing Local JSON...");
+        }
+
+        hardwareSyncService.syncLocalFileAsynchronously(
+                selectedFile,
+                result -> {
+                    onSyncComplete(result, true);
+                },
+                error -> {
+                    onSyncError(error);
+                }
+        );
+    }
+
+    // Refresh UI components and show results dialog upon sync completion
+    private void onSyncComplete(HardwareSyncService.SyncResult result, boolean showDetailedDemo) {
+        setStatusMessage(result.message());
+        if (threadPoolStatusLabel != null) {
+            threadPoolStatusLabel.setText("⚡ ThreadPool: 4 Workers Ready");
+        }
+        if (browseViewController != null) {
+            browseViewController.loadComponentsFromDatabase();
+        }
+        if (comparisonViewController != null) {
+            comparisonViewController.handleRefresh();
+        }
+
+        if (showDetailedDemo) {
+            showJsonSyncDemoDialog(result);
+        } else {
+            Alert info = new Alert(Alert.AlertType.INFORMATION);
+            info.setTitle("Sync Complete");
+            info.setHeaderText("Market Data Synchronized");
+            info.setContentText(result.message() + "\nSource: " + result.source());
+            info.showAndWait();
+        }
+    }
+
+    // Show error alert on sync failure
+    private void onSyncError(Throwable error) {
+        setStatusMessage("Sync error: " + error.getMessage());
+        if (threadPoolStatusLabel != null) {
+            threadPoolStatusLabel.setText("⚡ ThreadPool: 4 Workers Ready");
+        }
+        Alert err = new Alert(Alert.AlertType.ERROR, "Sync failed: " + error.getMessage());
+        err.showAndWait();
+    }
+
+    // Display a rich demonstration dialog showing HTTP Request info, raw JSON text, and Jackson parse details
+    private void showJsonSyncDemoDialog(HardwareSyncService.SyncResult result) {
+        Alert dialog = new Alert(Alert.AlertType.INFORMATION);
+        dialog.setTitle("JSON Feature & HTTP Request Demonstration");
+        dialog.setHeaderText("JSON Parsing & Market Data Sync Analysis");
+
+        VBox container = new VBox(10);
+        container.setPadding(new Insets(10));
+        container.setPrefWidth(640);
+
+        Label summaryLabel = new Label("Source: " + result.source() + " | Updated Components: " + result.updatedCount());
+        summaryLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #1e293b;");
+
+        Label logHeader = new Label("1. Protocol & Execution Details:");
+        logHeader.setStyle("-fx-font-weight: bold; -fx-text-fill: #2563eb;");
+        TextArea logArea = new TextArea(result.httpDetails());
+        logArea.setEditable(false);
+        logArea.setPrefRowCount(4);
+        logArea.setStyle("-fx-font-family: monospace; -fx-font-size: 11px;");
+
+        Label jsonHeader = new Label("2. Raw JSON Payload & Jackson Tree Node Parsing:");
+        jsonHeader.setStyle("-fx-font-weight: bold; -fx-text-fill: #16a34a;");
+        TextArea jsonArea = new TextArea(result.rawJson());
+        jsonArea.setEditable(false);
+        jsonArea.setPrefRowCount(10);
+        jsonArea.setStyle("-fx-font-family: monospace; -fx-font-size: 11px;");
+
+        container.getChildren().addAll(summaryLabel, logHeader, logArea, jsonHeader, jsonArea);
+        dialog.getDialogPane().setContent(container);
+        dialog.showAndWait();
+    }
+
 
     // Check if the user's password is correct to unlock admin mode
     @FXML

@@ -1,0 +1,50 @@
+[
+  {
+    "brand": "AMD",
+    "name": "Ryzen 5 5600",
+    "price": 114.99,
+    "source": "Local_File_Import_Newegg"
+  },
+  {
+    "brand": "AMD",
+    "name": "Ryzen 7 7700X",
+    "price": 274.99,
+    "source": "Local_File_Import_Amazon"
+  },
+  {
+    "brand": "AMD",
+    "name": "Ryzen 7 7800X3D",
+    "price": 349.99,
+    "source": "Local_File_Import_MicroCenter"
+  },
+  {
+    "brand": "NVIDIA",
+    "name": "GeForce RTX 4060",
+    "price": 284.99,
+    "source": "Local_File_Import_BestBuy"
+  },
+  {
+    "brand": "NVIDIA",
+    "name": "GeForce RTX 4060 Ti",
+    "price": 369.99,
+    "source": "Local_File_Import_B&H"
+  },
+  {
+    "brand": "AMD",
+    "name": "Radeon RX 6700 XT",
+    "price": 309.99,
+    "source": "Local_File_Import_Newegg"
+  },
+  {
+    "brand": "MSI",
+    "name": "B550-A PRO",
+    "price": 99.99,
+    "source": "Local_File_Import_Amazon"
+  },
+  {
+    "brand": "Corsair",
+    "name": "Vengeance LPX 16GB (2x8GB)",
+    "price": 34.99,
+    "source": "Local_File_Import_CorsairStore"
+  }
+]

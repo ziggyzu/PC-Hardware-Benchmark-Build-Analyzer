@@ -26,6 +26,9 @@
                     <Menu text="_Tools">
                         <items>
                             <MenuItem text="⚡ Sync Live Market Data (Async HTTP/JSON)" onAction="#handleSyncMarketData"/>
+                            <MenuItem text="🌐 HTTP JSON Request &amp; Jackson Parsing Demo" onAction="#handleSyncMarketDataWithDemo"/>
+                            <SeparatorMenuItem/>
+                            <MenuItem text="📁 Import &amp; Parse Local JSON File..." onAction="#handleImportLocalJsonFile"/>
                         </items>
                     </Menu>
                     <Menu text="_Security">
@@ -55,6 +58,9 @@
                     <Label text="Real-time compatibility diagnostics, pricing tracker, and multi-tier benchmark analysis" styleClass="app-subtitle"/>
                 </VBox>
                 <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                    <Button text="📁 Parse Local JSON" onAction="#handleImportLocalJsonFile" styleClass="btn-secondary" style="-fx-font-size: 11px;">
+                        <tooltip><Tooltip text="Load and parse a local .json hardware pricing dataset file"/></tooltip>
+                    </Button>
                     <Button text="⚡ Sync Live Data" onAction="#handleSyncMarketData" styleClass="btn-primary" style="-fx-font-size: 11px;">
                         <tooltip><Tooltip text="Fetch and parse market data asynchronously on background thread pool"/></tooltip>
                     </Button>

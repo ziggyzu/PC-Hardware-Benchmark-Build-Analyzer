@@ -1,0 +1,50 @@
+[
+  {
+    "brand": "AMD",
+    "name": "Ryzen 5 5600",
+    "price": 114.99,
+    "source": "Local_Resource_Import"
+  },
+  {
+    "brand": "AMD",
+    "name": "Ryzen 7 7700X",
+    "price": 274.99,
+    "source": "Local_Resource_Import"
+  },
+  {
+    "brand": "AMD",
+    "name": "Ryzen 7 7800X3D",
+    "price": 349.99,
+    "source": "Local_Resource_Import"
+  },
+  {
+    "brand": "NVIDIA",
+    "name": "GeForce RTX 4060",
+    "price": 284.99,
+    "source": "Local_Resource_Import"
+  },
+  {
+    "brand": "NVIDIA",
+    "name": "GeForce RTX 4060 Ti",
+    "price": 369.99,
+    "source": "Local_Resource_Import"
+  },
+  {
+    "brand": "AMD",
+    "name": "Radeon RX 6700 XT",
+    "price": 309.99,
+    "source": "Local_Resource_Import"
+  },
+  {
+    "brand": "NVIDIA",
+    "name": "GeForce RTX 5050",
+    "price": 250.99,
+    "source": "Local_Resource_Import"
+  },
+  {
+    "brand": "NVIDIA",
+    "name": "GeForce RTX 5060",
+    "price": 350.99,
+    "source": "Local_Resource_Import"
+  }
+]
