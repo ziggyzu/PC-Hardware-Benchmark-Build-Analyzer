@@ -1,50 +1,84 @@
 [
   {
+    "type": "CPU",
     "brand": "AMD",
     "name": "Ryzen 5 5600",
-    "price": 114.99,
-    "source": "Local_Resource_Import"
+    "price": 109.99,
+    "source": "Local_File_Import_Newegg"
   },
   {
+    "type": "CPU",
     "brand": "AMD",
     "name": "Ryzen 7 7700X",
-    "price": 274.99,
-    "source": "Local_Resource_Import"
+    "price": 269.99,
+    "source": "Local_File_Import_Amazon"
   },
   {
+    "type": "CPU",
     "brand": "AMD",
     "name": "Ryzen 7 7800X3D",
-    "price": 349.99,
-    "source": "Local_Resource_Import"
+    "price": 339.99,
+    "source": "Local_File_Import_MicroCenter"
   },
   {
+    "type": "GPU",
     "brand": "NVIDIA",
     "name": "GeForce RTX 4060",
-    "price": 284.99,
-    "source": "Local_Resource_Import"
+    "price": 279.99,
+    "source": "Local_File_Import_BestBuy"
   },
   {
+    "type": "GPU",
     "brand": "NVIDIA",
     "name": "GeForce RTX 4060 Ti",
-    "price": 369.99,
-    "source": "Local_Resource_Import"
+    "price": 359.99,
+    "source": "Local_File_Import_B&H"
   },
   {
+    "type": "GPU",
     "brand": "AMD",
     "name": "Radeon RX 6700 XT",
-    "price": 309.99,
-    "source": "Local_Resource_Import"
+    "price": 299.99,
+    "source": "Local_File_Import_Newegg"
   },
   {
+    "type": "MOTHERBOARD",
+    "brand": "MSI",
+    "name": "B550-A PRO",
+    "price": 94.99,
+    "source": "Local_File_Import_Amazon"
+  },
+  {
+    "type": "RAM",
+    "brand": "Corsair",
+    "name": "Vengeance LPX 16GB (2x8GB)",
+    "price": 32.99,
+    "source": "Local_File_Import_CorsairStore"
+  },
+  {
+    "type": "GPU",
     "brand": "NVIDIA",
     "name": "GeForce RTX 5050",
-    "price": 250.99,
-    "source": "Local_Resource_Import"
+    "price": 249.99,
+    "vram_gb": 8,
+    "board_power_watts": 115,
+    "recommended_psu_watts": 500,
+    "fps_1080p": 85.0,
+    "fps_1440p": 55.0,
+    "fps_4k": 28.0,
+    "source": "Local_File_Import_BestBuy"
   },
   {
+    "type": "GPU",
     "brand": "NVIDIA",
     "name": "GeForce RTX 5060",
-    "price": 350.99,
-    "source": "Local_Resource_Import"
+    "price": 312.99,
+    "vram_gb": 12,
+    "board_power_watts": 140,
+    "recommended_psu_watts": 550,
+    "fps_1080p": 110.0,
+    "fps_1440p": 75.0,
+    "fps_4k": 40.0,
+    "source": "Local_File_Import_BestBuy"
   }
 ]

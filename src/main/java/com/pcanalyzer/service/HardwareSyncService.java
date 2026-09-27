@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pcanalyzer.db.ComponentDao;
 import com.pcanalyzer.db.PriceHistoryDao;
-import com.pcanalyzer.model.Component;
+import com.pcanalyzer.model.*;
 import com.pcanalyzer.util.ThreadPoolManager;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -23,7 +23,7 @@ import java.util.function.Consumer;
 public class HardwareSyncService {
 
     // Where to look online for updated pricing
-    private static final String DEFAULT_PRICING_API_URL = "https://raw.githubusercontent.com/ziggyzu/PC-Hardware-Benchmark-Build-Analyzer/master/data/pricing-feed.json";
+    private static final String DEFAULT_PRICING_API_URL = "https://raw.githubusercontent.com/ziggyzu/PC-Hardware-Benchmark-Build-Analyzer/master/data/hardware-pricing.json";
     
     // Backup price list in case the computer is offline
     private static final String FALLBACK_JSON = """
@@ -48,7 +48,7 @@ public class HardwareSyncService {
         this.priceHistoryDao = priceHistoryDao;
         this.objectMapper = new ObjectMapper();
         this.httpClient = HttpClient.newBuilder()
-                .connectTimeout(Duration.ofSeconds(2))
+                .connectTimeout(Duration.ofSeconds(3))
                 .followRedirects(HttpClient.Redirect.NORMAL)
                 .build();
     }
@@ -81,19 +81,20 @@ public class HardwareSyncService {
 
         httpLog.append("HTTP Request: GET ").append(DEFAULT_PRICING_API_URL).append("\n");
         httpLog.append("Headers: Accept=application/json\n");
-        httpLog.append("Timeout: 2 seconds\n");
+        httpLog.append("Timeout: 3 seconds\n");
 
         // Try downloading latest prices from the internet
         try {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(DEFAULT_PRICING_API_URL))
-                    .timeout(Duration.ofSeconds(2))
+                    .timeout(Duration.ofSeconds(3))
                     .header("Accept", "application/json")
                     .GET()
                     .build();
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            httpLog.append("Response Status: ").append(response.statusCode()).append(" OK\n");
+            httpLog.append("Response Status: ").append(response.statusCode())
+                   .append(response.statusCode() == 200 ? " OK\n" : " (Non-200 Response)\n");
             httpLog.append("Content-Type: ").append(response.headers().firstValue("content-type").orElse("application/json")).append("\n");
 
             if (response.statusCode() == 200 && response.body() != null && !response.body().isBlank()) {
@@ -145,8 +146,10 @@ public class HardwareSyncService {
                 double newPrice = itemNode.path("price").asDouble();
                 String itemSource = itemNode.path("source").asText(sourceName);
 
+                boolean found = false;
                 for (Component comp : allComponents) {
                     if (comp.getBrand().equalsIgnoreCase(brand) && comp.getName().equalsIgnoreCase(name)) {
+                        found = true;
                         if (Math.abs(comp.getPrice() - newPrice) > 0.01) {
                             comp.setPrice(newPrice);
                             componentDao.save(comp);
@@ -158,11 +161,67 @@ public class HardwareSyncService {
                         break;
                     }
                 }
+
+                // If component does not exist in database, create and insert it as a new component
+                if (!found && !brand.isBlank() && !name.isBlank()) {
+                    Component newComp = createComponentFromJsonNode(itemNode, brand, name, newPrice);
+                    if (newComp != null) {
+                        Component saved = componentDao.save(newComp);
+                        if (priceHistoryDao != null && saved != null && saved.getId() != null) {
+                            priceHistoryDao.recordPrice(saved.getId(), newPrice, itemSource);
+                        }
+                        allComponents.add(saved);
+                        updatedCount++;
+                    }
+                }
             }
         }
 
         String message = "Successfully synced " + updatedCount + " components via " + sourceName + " on [" + threadName + "]";
         return new SyncResult(updatedCount, sourceName, message, true, jsonContent, logDetails);
+    }
+
+    // Helper to construct a new Component instance from JSON attributes
+    private Component createComponentFromJsonNode(JsonNode node, String brand, String name, double price) {
+        String typeStr = node.path("type").asText("CPU").toUpperCase();
+        int tdp = node.path("tdp_watts").asInt(65);
+
+        return switch (typeStr) {
+            case "GPU" -> new Gpu(
+                    null, brand, name, price, tdp,
+                    node.path("vram_gb").asInt(8),
+                    node.path("board_power_watts").asInt(180),
+                    node.path("recommended_psu_watts").asInt(550),
+                    node.path("fps_1080p").asDouble(90.0),
+                    node.path("fps_1440p").asDouble(60.0),
+                    node.path("fps_4k").asDouble(30.0)
+            );
+            case "MOTHERBOARD" -> new Motherboard(
+                    null, brand, name, price, tdp,
+                    node.path("socket").asText("AM4"),
+                    node.path("ram_type").asText("DDR4")
+            );
+            case "RAM" -> new Ram(
+                    null, brand, name, price, tdp,
+                    node.path("ram_type").asText("DDR4"),
+                    node.path("capacity_gb").asInt(16),
+                    node.path("speed_mhz").asInt(3200)
+            );
+            case "PSU" -> new Psu(
+                    null, brand, name, price, tdp,
+                    node.path("wattage").asInt(650),
+                    node.path("efficiency_rating").asText("80+ Gold")
+            );
+            default -> new Cpu(
+                    null, brand, name, price, tdp,
+                    node.path("socket").asText("AM4"),
+                    node.path("cores").asInt(6),
+                    node.path("threads").asInt(12),
+                    node.path("base_clock").asDouble(3.5),
+                    node.path("boost_clock").asDouble(4.4),
+                    node.path("benchmark_score").asInt(20000)
+            );
+        };
     }
 
     // Wrap the sync logic into a JavaFX background task
