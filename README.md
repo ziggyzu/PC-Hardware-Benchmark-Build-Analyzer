@@ -4,7 +4,7 @@
 [![JavaFX 21](https://img.shields.io/badge/JavaFX-21.0.2-blue.svg)](https://openjfx.io/)
 [![SQLite](https://img.shields.io/badge/Database-SQLite-lightgrey.svg)](https://www.sqlite.org/)
 [![Jackson JSON](https://img.shields.io/badge/JSON-Jackson--Databind-green.svg)](https://github.com/FasterXML/jackson)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 
 A feature-rich desktop application built with **Java 21** and **JavaFX** for analyzing PC hardware components, running real-time build compatibility diagnostics, comparing multi-tier benchmarks & price-to-performance efficiency, tracking price histories in an **SQLite** database, and synchronizing market pricing using **HTTP JSON APIs** and **Jackson JSON parsing**.
 
@@ -12,9 +12,9 @@ Repository Link: [https://github.com/ziggyzu/PC-Hardware-Benchmark-Build-Analyze
 
 ---
 
-## 🚀 Key Features & Capabilities
+## Key Features & Capabilities
 
-### 1. ⚡ Live HTTP & Local JSON Market Data Synchronization
+### 1. Live HTTP & Local JSON Market Data Synchronization
 * **Live Web Endpoint Integration**: Fetches real-time market pricing over HTTP GET using Java 11+ `java.net.http.HttpClient` targeting remote pricing feeds:
   - Remote API Endpoint: [`data/hardware-pricing.json`](https://github.com/ziggyzu/PC-Hardware-Benchmark-Build-Analyzer/blob/master/data/hardware-pricing.json)
 * **Jackson Tree Node Parsing**: Employs Jackson `ObjectMapper` and `JsonNode` tree model parsing to process hardware JSON payloads.
@@ -29,7 +29,7 @@ Repository Link: [https://github.com/ziggyzu/PC-Hardware-Benchmark-Build-Analyze
 
 ---
 
-### 2. 🔍 Hardware Catalog Browser & Price History Tracking
+### 2. Hardware Catalog Browser & Price History Tracking
 * **Multi-Category Hardware Filter**: Search and filter by component type: **CPU**, **GPU**, **Motherboard**, **RAM**, and **Power Supply (PSU)**.
 * **Real-time Search & Instant Search**: Filter catalog entries instantaneously by brand or model name.
 * **Price History Charting**: Visualizes historical price trends recorded over time in SQLite for every hardware part.
@@ -41,7 +41,7 @@ Repository Link: [https://github.com/ziggyzu/PC-Hardware-Benchmark-Build-Analyze
 
 ---
 
-### 3. 🛠️ PC Build Configurator & Real-Time Compatibility Diagnostics
+### 3. PC Build Configurator & Real-Time Compatibility Diagnostics
 * **Slot-based PC Builder**: Assemble full desktop configurations by selecting CPUs, GPUs, Motherboards, RAM kits, and Power Supplies.
 * **Automated Rule Engine Diagnostics**: Evaluates builds against hardware standard constraints:
   - **Socket Compatibility Check**: Validates CPU socket alignment against Motherboard socket standards (e.g. `AM4`, `AM5`, `LGA1700`).
@@ -55,7 +55,7 @@ Repository Link: [https://github.com/ziggyzu/PC-Hardware-Benchmark-Build-Analyze
 
 ---
 
-### 4. 📊 Performance Comparisons & Price-to-Performance Value Analysis
+### 4. Performance Comparisons & Price-to-Performance Value Analysis
 * **Multi-Resolution Gaming FPS Charts**: Interactive bar charts comparing GPU frame rates across three resolution settings: **1080p (FHD)**, **1440p (QHD)**, and **4K (UHD)**.
 * **Processor Benchmark Score Charts**: Compare multi-threaded CPU benchmark scores (PassMark rating scale).
 * **Value Efficiency Analysis**:
@@ -69,7 +69,7 @@ Repository Link: [https://github.com/ziggyzu/PC-Hardware-Benchmark-Build-Analyze
 
 ---
 
-### 5. 🗄️ Relational Database & Concurrency Architecture
+### 5. Relational Database & Concurrency Architecture
 * **SQLite Relational Schema**: 9 indexed database tables managed via standard JDBC:
   - Core Tables: [`components`](https://github.com/ziggyzu/PC-Hardware-Benchmark-Build-Analyzer/blob/master/src/main/java/com/pcanalyzer/db/DatabaseManager.java#L56), [`cpu_specs`](https://github.com/ziggyzu/PC-Hardware-Benchmark-Build-Analyzer/blob/master/src/main/java/com/pcanalyzer/db/DatabaseManager.java#L68), [`gpu_specs`](https://github.com/ziggyzu/PC-Hardware-Benchmark-Build-Analyzer/blob/master/src/main/java/com/pcanalyzer/db/DatabaseManager.java#L82), [`motherboard_specs`](https://github.com/ziggyzu/PC-Hardware-Benchmark-Build-Analyzer/blob/master/src/main/java/com/pcanalyzer/db/DatabaseManager.java#L96), [`ram_specs`](https://github.com/ziggyzu/PC-Hardware-Benchmark-Build-Analyzer/blob/master/src/main/java/com/pcanalyzer/db/DatabaseManager.java#L106), [`psu_specs`](https://github.com/ziggyzu/PC-Hardware-Benchmark-Build-Analyzer/blob/master/src/main/java/com/pcanalyzer/db/DatabaseManager.java#L117), [`price_history`](https://github.com/ziggyzu/PC-Hardware-Benchmark-Build-Analyzer/blob/master/src/main/java/com/pcanalyzer/db/DatabaseManager.java#L127), [`builds`](https://github.com/ziggyzu/PC-Hardware-Benchmark-Build-Analyzer/blob/master/src/main/java/com/pcanalyzer/db/DatabaseManager.java#L139), [`build_items`](https://github.com/ziggyzu/PC-Hardware-Benchmark-Build-Analyzer/blob/master/src/main/java/com/pcanalyzer/db/DatabaseManager.java#L148).
 * **DAO Pattern Implementation**: Clean separation between database querying and domain models:
@@ -80,7 +80,7 @@ Repository Link: [https://github.com/ziggyzu/PC-Hardware-Benchmark-Build-Analyze
 
 ---
 
-## 🛠️ Project Structure
+## Project Structure
 
 ```text
 PC-Hardware-Benchmark-Build-Analyzer/
@@ -138,7 +138,7 @@ PC-Hardware-Benchmark-Build-Analyzer/
 
 ---
 
-## 💻 Tech Stack & Prerequisites
+##  Tech Stack & Prerequisites
 
 * **Language**: Java 21 (JDK 21)
 * **UI Framework**: JavaFX 21.0.2 (`javafx-controls`, `javafx-fxml`)
@@ -149,7 +149,7 @@ PC-Hardware-Benchmark-Build-Analyzer/
 
 ---
 
-## ⚙️ How to Build and Run
+## How to Build and Run
 
 ### 1. Clone the Repository
 ```bash
@@ -179,6 +179,4 @@ Alternatively, on Windows double-click or run [`run.bat`](https://github.com/zig
 
 ---
 
-## 📄 License
 
-This project is open-source and available under the [MIT License](LICENSE).
