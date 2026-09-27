@@ -52,6 +52,13 @@ public class AddComponentDialogController {
     @FXML private TextField psuWattageField;
     @FXML private TextField psuRatingField;
 
+    // Storage Fields (SSD / Hard Disk)
+    @FXML private GridPane storageForm;
+    @FXML private TextField storageTypeField;
+    @FXML private TextField storageCapacityField;
+    @FXML private TextField storageReadSpeedField;
+    @FXML private TextField storageWriteSpeedField;
+
     // Password field for admin authentication
     @FXML private PasswordField adminPasswordField;
 
@@ -97,6 +104,9 @@ public class AddComponentDialogController {
         moboForm.setVisible(type == ComponentType.MOTHERBOARD);
         ramForm.setVisible(type == ComponentType.RAM);
         psuForm.setVisible(type == ComponentType.PSU);
+        if (storageForm != null) {
+            storageForm.setVisible(type == ComponentType.STORAGE);
+        }
     }
 
     // Validate inputs, verify password, and save the part to SQLite
@@ -164,6 +174,14 @@ public class AddComponentDialogController {
                     int wattage = Integer.parseInt(psuWattageField.getText().trim());
                     String rating = psuRatingField.getText().trim();
                     created = new Psu(null, brand, name, price, tdp, wattage, rating);
+                }
+                case STORAGE -> {
+                    String storageType = storageTypeField.getText().trim();
+                    if (storageType.isEmpty()) throw new IllegalArgumentException("Storage type is required (e.g. NVMe SSD).");
+                    int capacity = Integer.parseInt(storageCapacityField.getText().trim());
+                    int readSpeed = Integer.parseInt(storageReadSpeedField.getText().trim());
+                    int writeSpeed = Integer.parseInt(storageWriteSpeedField.getText().trim());
+                    created = new Storage(null, brand, name, price, tdp, storageType, capacity, readSpeed, writeSpeed);
                 }
                 default -> throw new IllegalStateException("Unexpected component type: " + type);
             }

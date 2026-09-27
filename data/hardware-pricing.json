@@ -56,6 +56,42 @@
     "source": "Local_File_Import_CorsairStore"
   },
   {
+    "type": "STORAGE",
+    "brand": "Samsung",
+    "name": "980 PRO 1TB",
+    "price": 84.99,
+    "tdp_watts": 10,
+    "storage_type": "NVMe SSD",
+    "capacity_gb": 1000,
+    "read_speed_mbs": 7000,
+    "write_speed_mbs": 5000,
+    "source": "Local_File_Import_Amazon"
+  },
+  {
+    "type": "STORAGE",
+    "brand": "Crucial",
+    "name": "P3 1TB",
+    "price": 54.99,
+    "tdp_watts": 8,
+    "storage_type": "NVMe SSD",
+    "capacity_gb": 1000,
+    "read_speed_mbs": 3500,
+    "write_speed_mbs": 3000,
+    "source": "Local_File_Import_Newegg"
+  },
+  {
+    "type": "STORAGE",
+    "brand": "Seagate",
+    "name": "BarraCuda 2TB",
+    "price": 49.99,
+    "tdp_watts": 15,
+    "storage_type": "HDD",
+    "capacity_gb": 2000,
+    "read_speed_mbs": 190,
+    "write_speed_mbs": 180,
+    "source": "Local_File_Import_BestBuy"
+  },
+  {
     "type": "GPU",
     "brand": "NVIDIA",
     "name": "GeForce RTX 5050",
@@ -79,6 +115,19 @@
     "fps_1080p": 110.0,
     "fps_1440p": 75.0,
     "fps_4k": 40.0,
+    "source": "Local_File_Import_BestBuy"
+  },
+  {
+    "type": "GPU",
+    "brand": "NVIDIA",
+    "name": "GeForce RTX 5060ti",
+    "price": 362.99,
+    "vram_gb": 16,
+    "board_power_watts": 140,
+    "recommended_psu_watts": 550,
+    "fps_1080p": 120.0,
+    "fps_1440p": 85.0,
+    "fps_4k": 50.0,
     "source": "Local_File_Import_BestBuy"
   }
 ]

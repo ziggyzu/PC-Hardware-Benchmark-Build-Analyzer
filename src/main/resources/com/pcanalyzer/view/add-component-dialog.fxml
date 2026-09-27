@@ -131,6 +131,25 @@
                 <Label text="Efficiency Rating:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
                 <TextField fx:id="psuRatingField" promptText="e.g. 80+ Bronze, 80+ Gold" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
             </GridPane>
+
+            <!-- Storage Spec Form (SSD / Hard Disk) -->
+            <GridPane fx:id="storageForm" hgap="12.0" vgap="10.0" visible="false">
+                <columnConstraints>
+                    <ColumnConstraints minWidth="130.0" prefWidth="140.0"/>
+                    <ColumnConstraints hgrow="ALWAYS"/>
+                </columnConstraints>
+                <Label text="Storage Type:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                <TextField fx:id="storageTypeField" promptText="e.g. NVMe SSD, SATA SSD, HDD" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                <Label text="Capacity (GB):" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                <TextField fx:id="storageCapacityField" promptText="e.g. 500, 1000, 2000" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                <Label text="Speeds (Read / Write):" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                <HBox spacing="8.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                    <TextField fx:id="storageReadSpeedField" promptText="Read MB/s (e.g. 7000)" HBox.hgrow="ALWAYS"/>
+                    <TextField fx:id="storageWriteSpeedField" promptText="Write MB/s (e.g. 5000)" HBox.hgrow="ALWAYS"/>
+                </HBox>
+            </GridPane>
         </StackPane>
 
         <Separator/>

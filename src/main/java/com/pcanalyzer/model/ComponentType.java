@@ -6,7 +6,8 @@ public enum ComponentType {
     GPU("GPU (Graphics Card)"),
     MOTHERBOARD("Motherboard"),
     RAM("RAM (Memory)"),
-    PSU("Power Supply (PSU)");
+    PSU("Power Supply (PSU)"),
+    STORAGE("Storage (SSD / Hard Disk)");
 
     // Human readable name for the UI
     private final String displayName;

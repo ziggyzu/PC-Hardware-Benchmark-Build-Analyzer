@@ -122,6 +122,18 @@ public class DatabaseManager {
                 );
             """);
 
+            // Storage specifications table (SSDs and Hard Disks)
+            stmt.execute("""
+                CREATE TABLE IF NOT EXISTS storage_specs (
+                    component_id INTEGER PRIMARY KEY,
+                    storage_type TEXT NOT NULL,
+                    capacity_gb INTEGER NOT NULL,
+                    read_speed_mbs INTEGER NOT NULL,
+                    write_speed_mbs INTEGER NOT NULL,
+                    FOREIGN KEY (component_id) REFERENCES components(id) ON DELETE CASCADE
+                );
+            """);
+
             // Historical price log table
             stmt.execute("""
                 CREATE TABLE IF NOT EXISTS price_history (
@@ -216,6 +228,13 @@ public class DatabaseManager {
             insertPsu(conn, "Corsair", "CX650M", 69.99, 0, 650, "80+ Bronze");
             insertPsu(conn, "Seasonic", "FOCUS GX-750", 109.99, 0, 750, "80+ Gold");
             insertPsu(conn, "Corsair", "RM850e", 119.99, 0, 850, "80+ Gold");
+
+            // Seed sample storage drives (SSDs & Hard Disks)
+            insertStorage(conn, "Samsung", "980 PRO 1TB", 89.99, 10, "NVMe SSD", 1000, 7000, 5000);
+            insertStorage(conn, "Crucial", "P3 1TB", 59.99, 8, "NVMe SSD", 1000, 3500, 3000);
+            insertStorage(conn, "Kingston", "A400 480GB", 34.99, 5, "SATA SSD", 480, 500, 450);
+            insertStorage(conn, "Seagate", "BarraCuda 2TB", 54.99, 15, "HDD", 2000, 190, 180);
+            insertStorage(conn, "Western Digital", "WD Blue 1TB", 42.99, 12, "HDD", 1000, 150, 140);
 
             // Commit all sample parts to the database
             conn.commit();
@@ -333,4 +352,20 @@ public class DatabaseManager {
             pstmt.executeUpdate();
         }
     }
+
+    // Insert storage drive specs including capacity, technology type, and speeds
+    private void insertStorage(Connection conn, String brand, String name, double price, int tdp,
+                               String storageType, int capacityGb, int readSpeed, int writeSpeed) throws SQLException {
+        int id = insertBaseComponent(conn, "STORAGE", brand, name, price, tdp);
+        String sql = "INSERT INTO storage_specs (component_id, storage_type, capacity_gb, read_speed_mbs, write_speed_mbs) VALUES (?, ?, ?, ?, ?)";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            pstmt.setString(2, storageType);
+            pstmt.setInt(3, capacityGb);
+            pstmt.setInt(4, readSpeed);
+            pstmt.setInt(5, writeSpeed);
+            pstmt.executeUpdate();
+        }
+    }
 }
+

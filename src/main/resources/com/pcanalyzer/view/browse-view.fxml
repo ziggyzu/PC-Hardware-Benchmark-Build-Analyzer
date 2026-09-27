@@ -64,6 +64,7 @@
                 <Button text="Motherboards" onAction="#handleQuickFilterMobo" style="-fx-font-size: 10px; -fx-padding: 2px 8px;"/>
                 <Button text="RAM" onAction="#handleQuickFilterRam" style="-fx-font-size: 10px; -fx-padding: 2px 8px;"/>
                 <Button text="PSUs" onAction="#handleQuickFilterPsu" style="-fx-font-size: 10px; -fx-padding: 2px 8px;"/>
+                <Button text="Storage" onAction="#handleQuickFilterStorage" style="-fx-font-size: 10px; -fx-padding: 2px 8px;"/>
             </FlowPane>
         </HBox>
 

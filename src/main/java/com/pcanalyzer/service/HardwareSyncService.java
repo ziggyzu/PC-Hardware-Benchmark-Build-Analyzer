@@ -212,6 +212,13 @@ public class HardwareSyncService {
                     node.path("wattage").asInt(650),
                     node.path("efficiency_rating").asText("80+ Gold")
             );
+            case "STORAGE", "SSD", "HDD" -> new Storage(
+                    null, brand, name, price, tdp,
+                    node.path("storage_type").asText("NVMe SSD"),
+                    node.path("capacity_gb").asInt(1000),
+                    node.path("read_speed_mbs").asInt(3500),
+                    node.path("write_speed_mbs").asInt(3000)
+            );
             default -> new Cpu(
                     null, brand, name, price, tdp,
                     node.path("socket").asText("AM4"),

@@ -91,6 +91,19 @@
                             <Label fx:id="psuSpecsLabel" text="Select a PSU from the Hardware Catalog" style="-fx-text-fill: #64748b;"/>
                         </VBox>
                     </TitledPane>
+
+                    <!-- Storage Slot (SSD / Hard Disk) -->
+                    <TitledPane fx:id="storageTitledPane" text="Storage (SSD / Hard Disk) — None Selected" expanded="true">
+                        <VBox spacing="8.0" style="-fx-padding: 10px;">
+                            <HBox alignment="CENTER_LEFT" spacing="8.0">
+                                <Label fx:id="storageNameLabel" text="No Storage Drive selected" style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Label fx:id="storagePriceLabel" text="\$0.00" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2563eb;"/>
+                                <Button text="Remove" onAction="#handleRemoveStorage" styleClass="btn-secondary" style="-fx-font-size: 10px;"/>
+                            </HBox>
+                            <Label fx:id="storageSpecsLabel" text="Select an SSD or Hard Disk from the Hardware Catalog" style="-fx-text-fill: #64748b;"/>
+                        </VBox>
+                    </TitledPane>
                 </panes>
             </Accordion>
         </VBox>

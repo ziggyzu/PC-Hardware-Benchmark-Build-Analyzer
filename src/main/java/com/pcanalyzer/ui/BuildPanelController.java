@@ -46,6 +46,12 @@ public class BuildPanelController {
     @FXML private Label psuSpecsLabel;
     @FXML private Label psuPriceLabel;
 
+    // Storage drive slot labels
+    @FXML private TitledPane storageTitledPane;
+    @FXML private Label storageNameLabel;
+    @FXML private Label storageSpecsLabel;
+    @FXML private Label storagePriceLabel;
+
     // Budget tracker labels and slider
     @FXML private Label totalPriceLabel;
     @FXML private Label budgetValueLabel;
@@ -151,6 +157,13 @@ public class BuildPanelController {
         refreshBuildView();
     }
 
+    // Take the storage drive out of the build
+    @FXML
+    private void handleRemoveStorage() {
+        currentBuild.setStorage(null);
+        refreshBuildView();
+    }
+
     // Remove all parts from the current build
     @FXML
     private void handleClearBuild() {
@@ -236,6 +249,20 @@ public class BuildPanelController {
             psuNameLabel.setText("No PSU selected");
             psuSpecsLabel.setText("Select a PSU from the Hardware Catalog");
             psuPriceLabel.setText("$0.00");
+        }
+
+        // Update the Storage card
+        Storage storage = currentBuild.getStorage();
+        if (storage != null && storageTitledPane != null) {
+            storageTitledPane.setText("Storage — " + storage.getBrand() + " " + storage.getName());
+            if (storageNameLabel != null) storageNameLabel.setText(storage.getBrand() + " " + storage.getName());
+            if (storageSpecsLabel != null) storageSpecsLabel.setText(storage.getKeySpecs());
+            if (storagePriceLabel != null) storagePriceLabel.setText(String.format("$%.2f", storage.getPrice()));
+        } else if (storageTitledPane != null) {
+            storageTitledPane.setText("Storage (SSD / Hard Disk) — None Selected");
+            if (storageNameLabel != null) storageNameLabel.setText("No Storage Drive selected");
+            if (storageSpecsLabel != null) storageSpecsLabel.setText("Select an SSD or Hard Disk from the Hardware Catalog");
+            if (storagePriceLabel != null) storagePriceLabel.setText("$0.00");
         }
 
         // Recalculate price and power numbers

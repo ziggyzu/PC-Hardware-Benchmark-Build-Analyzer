@@ -274,6 +274,7 @@ public class BrowseController {
     @FXML private void handleQuickFilterMobo() { selectCategory(ComponentType.MOTHERBOARD.getDisplayName()); }
     @FXML private void handleQuickFilterRam() { selectCategory(ComponentType.RAM.getDisplayName()); }
     @FXML private void handleQuickFilterPsu() { selectCategory(ComponentType.PSU.getDisplayName()); }
+    @FXML private void handleQuickFilterStorage() { selectCategory(ComponentType.STORAGE.getDisplayName()); }
 
     // Helper to select a category by its name
     private void selectCategory(String displayName) {

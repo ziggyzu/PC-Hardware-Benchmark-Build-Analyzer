@@ -16,6 +16,7 @@ public class Build {
     private Motherboard motherboard;
     private Ram ram;
     private Psu psu;
+    private Storage storage;
     private final List<Component> extraComponents = new ArrayList<>();
 
     // Estimated baseline power used by motherboard, fans, and storage
@@ -89,6 +90,14 @@ public class Build {
         this.psu = psu;
     }
 
+    public Storage getStorage() {
+        return storage;
+    }
+
+    public void setStorage(Storage storage) {
+        this.storage = storage;
+    }
+
     // Manage any extra components added to the build
     public List<Component> getExtraComponents() {
         return Collections.unmodifiableList(extraComponents);
@@ -113,6 +122,7 @@ public class Build {
             case MOTHERBOARD -> setMotherboard((Motherboard) component);
             case RAM -> setRam((Ram) component);
             case PSU -> setPsu((Psu) component);
+            case STORAGE -> setStorage((Storage) component);
         }
     }
 
@@ -124,6 +134,7 @@ public class Build {
         else if (Objects.equals(motherboard, component)) motherboard = null;
         else if (Objects.equals(ram, component)) ram = null;
         else if (Objects.equals(psu, component)) psu = null;
+        else if (Objects.equals(storage, component)) storage = null;
         else extraComponents.remove(component);
     }
 
@@ -134,6 +145,7 @@ public class Build {
         motherboard = null;
         ram = null;
         psu = null;
+        storage = null;
         extraComponents.clear();
     }
 
@@ -145,6 +157,7 @@ public class Build {
         if (motherboard != null) list.add(motherboard);
         if (ram != null) list.add(ram);
         if (psu != null) list.add(psu);
+        if (storage != null) list.add(storage);
         list.addAll(extraComponents);
         return list;
     }
@@ -160,7 +173,8 @@ public class Build {
     public int getTotalTdpWatts() {
         int cpuWatts = cpu != null ? cpu.getTdpWatts() : 0;
         int gpuWatts = gpu != null ? Math.max(gpu.getTdpWatts(), gpu.getBoardPowerWatts()) : 0;
-        return cpuWatts + gpuWatts;
+        int storageWatts = storage != null ? storage.getTdpWatts() : 0;
+        return cpuWatts + gpuWatts + storageWatts;
     }
 
     // Calculate maximum expected power usage including system baseline

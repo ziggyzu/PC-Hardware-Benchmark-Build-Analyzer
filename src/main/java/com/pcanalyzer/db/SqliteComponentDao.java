@@ -24,13 +24,15 @@ public class SqliteComponentDao implements ComponentDao {
                gs.vram_gb, gs.board_power_watts, gs.recommended_psu_watts, gs.fps_1080p, gs.fps_1440p, gs.fps_4k,
                ms.socket AS mobo_socket, ms.ram_type AS mobo_ram_type,
                rs.ram_type AS ram_type, rs.capacity_gb, rs.speed_mhz,
-               ps.wattage, ps.efficiency_rating
+               ps.wattage, ps.efficiency_rating,
+               ss.storage_type, ss.capacity_gb AS storage_capacity_gb, ss.read_speed_mbs, ss.write_speed_mbs
         FROM components c
         LEFT JOIN cpu_specs cs ON c.id = cs.component_id
         LEFT JOIN gpu_specs gs ON c.id = gs.component_id
         LEFT JOIN motherboard_specs ms ON c.id = ms.component_id
         LEFT JOIN ram_specs rs ON c.id = rs.component_id
         LEFT JOIN psu_specs ps ON c.id = ps.component_id
+        LEFT JOIN storage_specs ss ON c.id = ss.component_id
     """;
 
     // Set up with our database manager
@@ -263,6 +265,18 @@ public class SqliteComponentDao implements ComponentDao {
                     pstmt.executeUpdate();
                 }
             }
+            case STORAGE -> {
+                Storage storage = (Storage) comp;
+                String sql = "INSERT INTO storage_specs (component_id, storage_type, capacity_gb, read_speed_mbs, write_speed_mbs) VALUES (?, ?, ?, ?, ?)";
+                try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                    pstmt.setInt(1, storage.getId());
+                    pstmt.setString(2, storage.getStorageType());
+                    pstmt.setInt(3, storage.getCapacityGb());
+                    pstmt.setInt(4, storage.getReadSpeedMbS());
+                    pstmt.setInt(5, storage.getWriteSpeedMbS());
+                    pstmt.executeUpdate();
+                }
+            }
         }
     }
 
@@ -328,6 +342,18 @@ public class SqliteComponentDao implements ComponentDao {
                     pstmt.executeUpdate();
                 }
             }
+            case STORAGE -> {
+                Storage storage = (Storage) comp;
+                String sql = "UPDATE storage_specs SET storage_type = ?, capacity_gb = ?, read_speed_mbs = ?, write_speed_mbs = ? WHERE component_id = ?";
+                try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                    pstmt.setString(1, storage.getStorageType());
+                    pstmt.setInt(2, storage.getCapacityGb());
+                    pstmt.setInt(3, storage.getReadSpeedMbS());
+                    pstmt.setInt(4, storage.getWriteSpeedMbS());
+                    pstmt.setInt(5, storage.getId());
+                    pstmt.executeUpdate();
+                }
+            }
         }
     }
 
@@ -388,6 +414,13 @@ public class SqliteComponentDao implements ComponentDao {
                     id, brand, name, price, tdpWatts,
                     rs.getInt("wattage"),
                     rs.getString("efficiency_rating")
+            );
+            case STORAGE -> new Storage(
+                    id, brand, name, price, tdpWatts,
+                    rs.getString("storage_type"),
+                    rs.getInt("storage_capacity_gb"),
+                    rs.getInt("read_speed_mbs"),
+                    rs.getInt("write_speed_mbs")
             );
         };
     }
